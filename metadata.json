@@ -1,6 +1,6 @@
 {
   "name": "VunaAI",
   "description": "Expert IA Panafricain pour l'agriculture : diagnostic des cultures, conseils agroécologiques et calendriers de semis adaptés aux climats africains.",
-  "requestFramePermissions": ["camera"],
+  "requestFramePermissions": ["camera", "geolocation"],
   "majorCapabilities": ["Multimodal AI", "Agricultural Diagnosis"]
 }

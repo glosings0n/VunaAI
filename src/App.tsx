@@ -4,8 +4,9 @@ import CameraCapture from './components/CameraCapture';
 import DiagnosisResult from './components/DiagnosisResult';
 import { analyzeCropPhoto, AnalysisResult } from './services/geminiService';
 import { motion, AnimatePresence } from 'motion/react';
-import { History, Sprout, ChevronLeft, Calendar, Languages, Globe, Info, Sun, Leaf, LayoutDashboard, Camera } from 'lucide-react';
+import { History, Leaf, ChevronLeft, Calendar, Languages, Globe, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin } from 'lucide-react';
 import { translations, Language } from './constants/translations';
+import { fetchLocalWeather, WeatherData } from './services/weatherService';
 
 interface ScanHistoryItem {
   id: string;
@@ -24,14 +25,44 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('fr');
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+  const [locationError, setLocationError] = useState<boolean>(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   const t = translations[language];
+
+  const handleRequestLocation = () => {
+    if ("geolocation" in navigator) {
+      setIsLoadingWeather(true);
+      setLocationError(false);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const data = await fetchLocalWeather(position.coords.latitude, position.coords.longitude);
+            setWeather(data);
+            setLocationError(false);
+          } catch (e) {
+            console.error("Weather error", e);
+          } finally {
+            setIsLoadingWeather(false);
+          }
+        },
+        (err) => {
+          console.warn("Geolocation denied", err);
+          setLocationError(true);
+          setIsLoadingWeather(false);
+        },
+        { timeout: 10000 }
+      );
+    }
+  };
 
   const SidebarContent = () => (
     <>
       <div className="flex items-center gap-2 mb-8">
         <div className="w-9 h-9 bg-brand rounded-lg flex items-center justify-center">
-          <Sprout size={20} className="text-white" />
+          <Leaf size={20} className="text-white" />
         </div>
         <div>
           <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">{t.appName}</h1>
@@ -94,6 +125,12 @@ export default function App() {
              <span className="text-[10px] font-bold text-slate-600">{t.ready}</span>
           </div>
         </div>
+
+        <div className="pt-2 text-center">
+          <p className="text-[8px] text-slate-300 font-bold tracking-tight uppercase">
+            © 2026 VunaAI. All rights reserved.
+          </p>
+        </div>
       </div>
     </>
   );
@@ -117,6 +154,15 @@ export default function App() {
         console.error("Failed to load history", e);
       }
     }
+
+    // Fetch Weather Automatically if possible
+    if ("geolocation" in navigator) {
+      navigator.permissions.query({ name: 'geolocation' as PermissionName }).then((result) => {
+        if (result.state === 'granted') {
+          handleRequestLocation();
+        }
+      });
+    }
   }, []);
 
   const saveToHistory = (result: AnalysisResult, image: string) => {
@@ -132,6 +178,7 @@ export default function App() {
   };
 
   const handleCapture = async (base64: string, mimeType: string) => {
+    setCapturedImage(base64);
     setIsProcessing(true);
     setError(null);
     try {
@@ -145,6 +192,7 @@ export default function App() {
       }, 300);
     } catch (err: any) {
       setError(err.message || "Une erreur est survenue lors de l'analyse.");
+      setCapturedImage(null);
     } finally {
       setIsProcessing(false);
     }
@@ -213,6 +261,72 @@ export default function App() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Weather Widget */}
+                  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center gap-2 max-w-[80%]">
+                        <MapPin size={14} className="text-slate-400 shrink-0" />
+                        <h3 className="font-bold text-[10px] uppercase text-slate-400 tracking-wider truncate">
+                          {weather?.locationName || (t as any).weatherTitle || 'Météo Locale'}
+                        </h3>
+                      </div>
+                      {weather?.isRaining ? (
+                        <CloudRain size={18} className="text-blue-500 animate-bounce" />
+                      ) : (
+                        <Sun size={18} className="text-orange-400 animate-pulse" />
+                      )}
+                    </div>
+
+                    {!weather && isLoadingWeather ? (
+                      <div className="py-4 space-y-2">
+                        <div className="h-8 w-24 bg-slate-50 animate-pulse rounded" />
+                        <div className="h-4 w-32 bg-slate-50 animate-pulse rounded" />
+                      </div>
+                    ) : weather ? (
+                      <div className="space-y-4">
+                        <div className="flex items-end gap-2">
+                          <span className="text-3xl font-black text-slate-900 leading-none">
+                            {Math.round(weather.temperature)}°C
+                          </span>
+                          <span className="text-xs text-slate-400 font-bold mb-1">{(t as any).temperature || 'Temp'}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <Droplets size={12} className="text-blue-400" />
+                            <span className="text-[10px] font-bold text-slate-600">{weather.humidity}%</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <CloudRain size={12} className="text-slate-400" />
+                            <span className="text-[10px] font-bold text-slate-600">{weather.precipitation}mm</span>
+                          </div>
+                        </div>
+
+                        <div className={`text-[10px] font-bold p-2 rounded-lg flex items-center gap-2 ${weather.isRaining ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                           <Info size={12} />
+                           <span>
+                             {weather.isRaining 
+                               ? ((t as any).weatherWarning || 'Rain expected') 
+                               : ((t as any).weatherGood || 'Ideal conditions')}
+                           </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="py-2">
+                        <p className="text-[10px] text-slate-400 mb-3">
+                          {locationError ? (t as any).locationDenied : (t as any).locationRequired}
+                        </p>
+                        <button 
+                          onClick={handleRequestLocation}
+                          className="w-full py-2 bg-brand/10 text-brand text-[10px] font-bold rounded-lg border border-brand/20 hover:bg-brand/20 transition-all flex items-center justify-center gap-2"
+                        >
+                          <MapPin size={12} />
+                          {(t as any).enableLocation || 'Activer ma position'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="bg-brand rounded-2xl p-6 text-white relative overflow-hidden shadow-sm h-48 flex flex-col justify-between">
                     <div className="relative z-10">
                       <h2 className="text-xl font-bold mb-2">{t.smartDiag}</h2>
@@ -222,13 +336,15 @@ export default function App() {
                     </div>
                     <button 
                       onClick={() => setCurrentView('scanner')}
-                      className="relative z-10 bg-white text-brand px-4 py-2 rounded-lg text-[10px] font-bold w-fit hover:bg-slate-50 transition-colors"
+                      className="relative z-10 bg-white text-brand px-4 py-2 rounded-lg text-[10px] font-bold w-fit hover:bg-slate-50 transition-all font-sans"
                     >
                       {t.scanCrop}
                     </button>
                   </div>
+                </div>
 
-                  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-48 flex flex-col justify-between">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-48 flex flex-col justify-between md:col-span-2 lg:col-span-1">
                      <div className="flex justify-between items-center">
                         <h3 className="font-bold text-xs uppercase text-slate-400 tracking-wider">{t.climateState}</h3>
                         <div className="w-2 h-2 rounded-full bg-emerald-400" />
@@ -265,12 +381,36 @@ export default function App() {
                     </div>
                   </div>
                 ) : isProcessing ? (
-                  <div className="py-24 text-center">
-                    <div className="animate-spin text-brand inline-block mb-4">
-                      <Sprout size={48} />
+                  <div className="py-8 flex flex-col items-center">
+                    <div className="mb-8 text-center">
+                      <div className="inline-block animate-bounce mb-3">
+                         <Sprout size={32} className="text-brand" />
+                      </div>
+                      <h2 className="text-xl font-bold text-slate-900 mb-1">{t.analyzing}</h2>
+                      <p className="text-xs text-slate-400 font-medium">{t.applyingContext}</p>
                     </div>
-                    <p className="font-bold text-slate-600">{t.analyzing}</p>
-                    <p className="text-xs text-slate-400">{t.applyingContext}</p>
+
+                    {capturedImage && (
+                      <div className="relative w-full max-w-sm aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                        <img 
+                          src={capturedImage} 
+                          alt="Captured" 
+                          className="w-full h-full object-cover grayscale-[0.5] opacity-80"
+                        />
+                        {/* Scanning Line Animation */}
+                        <motion.div 
+                          className="absolute inset-x-0 h-1 bg-brand shadow-[0_0_15px_rgba(62,142,94,0.8)] z-10"
+                          initial={{ top: 0 }}
+                          animate={{ top: '100%' }}
+                          transition={{ 
+                            repeat: Infinity, 
+                            duration: 2, 
+                            ease: "linear" 
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-brand/10 to-transparent pointer-events-none" />
+                      </div>
+                    )}
                   </div>
                 ) : diagnosis && (
                   <div className="space-y-6">
@@ -350,10 +490,18 @@ export default function App() {
                   
                   <div className="grid gap-3">
                     {[
-                      { crop: t.manioc, period: 'Mars - Juin', tip: 'Equatorial / Tropical humide', icon: '🌱' },
-                      { crop: t.maize, period: 'Avril - Juillet', tip: 'Zone savane / Transition', icon: '🌽' },
-                      { crop: t.sorghum, period: 'Juin - Août', tip: 'Zone Sahélienne', icon: '🌾' },
-                      { crop: t.peanut, period: 'Mai - Juillet', tip: 'Toute zone tropicale', icon: '🥜' }
+                      { crop: (t as any).manioc, period: 'Mars - Juin', tip: 'Afrique Centrale / Ouest (Zones humides)', icon: '🌱' },
+                      { crop: (t as any).maize, period: 'Avril - Juillet', tip: 'Toute l\'Afrique Subsaharienne', icon: '🌽' },
+                      { crop: (t as any).sorghum, period: 'Juin - Août', tip: 'Zone Sahélienne / Afrique de l\'Est', icon: '🌾' },
+                      { crop: (t as any).peanut, period: 'Mai - Juillet', tip: 'Sénégal, Mali, Nigeria (Zones sèches)', icon: '🥜' },
+                      { crop: (t as any).cocoa, period: 'Sept - Nov', tip: 'Côte d\'Ivoire, Ghana, Cameroun', icon: '🍫' },
+                      { crop: (t as any).coffee, period: 'Oct - Jan', tip: 'Éthiopie, Kenya, Rwanda (Hautes terres)', icon: '☕' },
+                      { crop: (t as any).yam, period: 'Fév - Avr', tip: 'Bénin, Nigeria, Togo (Zone forêt)', icon: '🍠' },
+                      { crop: (t as any).cowpea, period: 'Juil - Sept', tip: 'Nigeria, Niger, Burkina Faso', icon: '🍲' },
+                      { crop: (t as any).rice, period: 'Juin - Sept', tip: 'Madagascar, Guinée, Sénégal (Bas-fonds)', icon: '🍚' },
+                      { crop: (t as any).plantain, period: 'Toute l\'année', tip: 'Afrique Centrale & Côte Atlantique', icon: '🍌' },
+                      { crop: (t as any).potato, period: 'Nov - Fév', tip: 'Afrique du Nord / Afrique du Sud', icon: '🥔' },
+                      { crop: (t as any).sweetPotato, period: 'Avril - Juin', tip: 'Afrique de l\'Est & Australe', icon: '🍠' }
                     ].map((item, i) => (
                       <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-brand/20 transition-all">
                         <div className="flex items-center gap-4">
@@ -363,7 +511,7 @@ export default function App() {
                             <p className="text-[10px] text-slate-400 font-medium italic">{item.tip}</p>
                           </div>
                         </div>
-                        <span className="text-[9px] font-black text-brand bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">{item.period}</span>
+                        <span className="text-[9px] font-black text-brand bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm whitespace-nowrap">{item.period}</span>
                       </div>
                     ))}
                   </div>

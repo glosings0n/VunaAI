@@ -43,7 +43,7 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
           <div>
             <h2 className="text-xl font-bold text-slate-900">{result.commonName}</h2>
             {result.scientificName && (
-              <p className="text-brand text-xs italic font-semibold">{result.scientificName}</p>
+              <p className="text-brand text-xs italic font-medium opacity-90 mt-0.5">{result.scientificName}</p>
             )}
           </div>
           
@@ -90,7 +90,10 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
                 <ShieldCheck size={20} />
               </div>
               <div>
-                <h3 className="text-sm font-bold">Action Recommandée</h3>
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  {treatmentType === 'bio' ? <Leaf size={16} className="text-emerald-600" /> : <FlaskConical size={16} className="text-slate-600" />}
+                  Action Recommandée
+                </h3>
                 <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest">{treatmentType === 'bio' ? 'Naturelle' : 'Matières Actives'}</p>
               </div>
             </div>
@@ -112,7 +115,7 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
             </div>
           </div>
 
-          <div className="text-xs text-slate-600 prose prose-sm max-w-none prose-emerald">
+          <div className="text-xs text-slate-600">
             <div className="markdown-body">
               <ReactMarkdown>
                 {treatmentType === 'bio' ? result.biologicalTreatment : result.chemicalTreatment}

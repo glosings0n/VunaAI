@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sprout, Menu, Settings } from 'lucide-react';
+import { Leaf, Menu, Settings } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -17,7 +17,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
             <Menu size={20} />
           </button>
           <div className="bg-brand p-1.5 rounded-lg text-white">
-            <Sprout size={18} />
+            <Leaf size={18} />
           </div>
           <h1 className="text-sm font-black text-slate-800 tracking-tight">VunaAI</h1>
         </div>
