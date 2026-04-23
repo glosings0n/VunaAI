@@ -57,4 +57,4 @@ VunaAI combat l'insécurité alimentaire en Afrique en mettant une expertise agr
 
 ---
 
-© 2026 VunaAI - Built with ❤️ by [glosings0n](https://github.com/glosings0n) for Africa.
+© 2026 VunaAI - Built with ❤️ by [glosings0n](https://linktr.ee/glosings0n) for Africa.
