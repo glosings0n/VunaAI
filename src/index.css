@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-brand: #3e8e5e;
+  --color-brand-light: #f1f7f1;
+  --color-brand-dark: #1e291b;
+  --color-brand-bg: #ffffff;
+  
+  /* Minimalist shades */
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans text-sm;
+  }
+}
+
+.glass-card {
+  @apply bg-white rounded-xl border border-slate-100 shadow-sm transition-all;
+}
+
+.bg-pattern {
+  background-image: radial-gradient(#3e8e5e08 1px, transparent 1px);
+  background-size: 16px 16px;
+}
