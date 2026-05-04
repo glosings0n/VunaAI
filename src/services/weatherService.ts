@@ -4,6 +4,7 @@ export interface WeatherData {
   humidity: number;
   isRaining: boolean;
   locationName?: string;
+  countryCode?: string;
 }
 
 export async function fetchLocalWeather(lat: number, lon: number): Promise<WeatherData> {
@@ -33,7 +34,8 @@ export async function fetchLocalWeather(lat: number, lon: number): Promise<Weath
       precipitation: current.precipitation,
       humidity: current.relative_humidity_2m,
       isRaining: current.precipitation > 0,
-      locationName
+      locationName,
+      countryCode: geoData.countryCode
     };
   } catch (error) {
     console.error("Error fetching weather or location:", error);

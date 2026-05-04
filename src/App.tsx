@@ -4,7 +4,7 @@ import CameraCapture from './components/CameraCapture';
 import DiagnosisResult from './components/DiagnosisResult';
 import { analyzeCropPhoto, AnalysisResult } from './services/geminiService';
 import { motion, AnimatePresence } from 'motion/react';
-import { History, Leaf, ChevronLeft, Calendar, Languages, Globe, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin, Sprout } from 'lucide-react';
+import { History, ChevronLeft, Calendar, Languages, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin, Sprout, Settings as SettingsIcon, Trash2, AlertTriangle } from 'lucide-react';
 import { translations, Language } from './constants/translations';
 import { fetchLocalWeather, WeatherData } from './services/weatherService';
 import { Routes, Route, useNavigate, useLocation, NavLink, Navigate } from 'react-router-dom';
@@ -31,8 +31,35 @@ export default function App() {
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
   const [locationError, setLocationError] = useState<boolean>(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [activeRegion, setActiveRegion] = useState<string>('East');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   const t = translations[language];
+
+  const handleToggleNotifications = async () => {
+    if (!("Notification" in window)) return;
+
+    if (notificationsEnabled) {
+      setNotificationsEnabled(false);
+    } else {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          setNotificationsEnabled(true);
+        } else if (permission === 'denied') {
+          alert("Les notifications sont désactivées dans votre navigateur. Veuillez les autoriser pour recevoir les alertes.");
+          setNotificationsEnabled(false);
+        } else {
+          // User closed the popup without choosing
+          setNotificationsEnabled(false);
+        }
+      } catch (err) {
+        console.error("Error requesting notifications", err);
+        setNotificationsEnabled(false);
+      }
+    }
+  };
 
   const handleRequestLocation = () => {
     if ("geolocation" in navigator) {
@@ -44,6 +71,16 @@ export default function App() {
             const data = await fetchLocalWeather(position.coords.latitude, position.coords.longitude);
             setWeather(data);
             setLocationError(false);
+
+            // Auto language detection based on country
+            if (data.countryCode) {
+              const englishSpeaking = [
+                'US', 'GB', 'CA', 'AU', 'NZ', 'IE', // General
+                'ZA', 'NG', 'KE', 'TZ', 'GH', 'UG', 'ZW', 'ZM', 'MW', 'BW', 'NA', 'SL', 'LR', 'GM', 'ET', 'SD', 'MU', 'SC', 'LS', 'SZ' // Africa
+              ];
+              const detectedLang: Language = englishSpeaking.includes(data.countryCode) ? 'en' : 'fr';
+              setLanguage(detectedLang);
+            }
           } catch (e) {
             console.error("Weather error", e);
           } finally {
@@ -55,19 +92,23 @@ export default function App() {
           setLocationError(true);
           setIsLoadingWeather(false);
         },
-        { timeout: 10000 }
+        { 
+          timeout: 15000, 
+          enableHighAccuracy: true,
+          maximumAge: 0
+        }
       );
     }
   };
 
+  const currentYear = new Date().getUTCFullYear();
+
   const SidebarContent = () => (
     <>
       <div className="flex items-center gap-2 mb-8">
-        <div className="w-9 h-9 bg-brand rounded-lg flex items-center justify-center">
-          <Leaf size={20} className="text-white" />
-        </div>
+        <span className="text-2xl">🌿</span>
         <div>
-          <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">{t.appName}</h1>
+          <h1 className="text-lg font-extrabold text-slate-900">{t.appName}</h1>
         </div>
       </div>
 
@@ -104,27 +145,19 @@ export default function App() {
           <History size={16} />
           <span>{t.history}</span>
         </NavLink>
+        <NavLink 
+          to="/settings"
+          onClick={() => { setIsSidebarOpen(false); }}
+          className={({ isActive }) => `hidden lg:flex w-full items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+        >
+          <SettingsIcon size={16} />
+          <span>Paramètres</span>
+        </NavLink>
       </nav>
 
       <div className="space-y-4 pt-4 border-t border-slate-50">
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-           <div className="flex items-center gap-2 mb-2">
-              <Globe size={12} className="text-slate-400" />
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{t.localLanguage}</p>
-           </div>
-           <select 
-             value={language}
-             onChange={(e) => setLanguage(e.target.value as Language)}
-             className="w-full bg-white border border-slate-200 py-2 px-2 rounded-lg text-[10px] font-bold shadow-sm focus:outline-none focus:border-brand"
-           >
-             {languages.map(lang => (
-               <option key={lang.id} value={lang.id}>{lang.label}</option>
-             ))}
-           </select>
-        </div>
-
-        <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-          <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t.offlineMode}</p>
+          <p className="text-[8px] font-bold text-slate-400 uppercase mb-1">{t.offlineMode}</p>
           <p className="text-[10px] text-slate-500 mb-2 leading-snug">{t.offlineDesc}</p>
           <div className="flex items-center gap-2">
              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -133,8 +166,8 @@ export default function App() {
         </div>
 
         <div className="pt-2 text-center">
-          <p className="text-[8px] text-slate-300 font-bold tracking-tight uppercase">
-            © 2026 VunaAI. All rights reserved.
+          <p className="text-[8px] text-slate-300 font-bold">
+            © {currentYear} LosingTech. All rights reserved.
           </p>
         </div>
       </div>
@@ -142,13 +175,8 @@ export default function App() {
   );
 
   const languages = [
-    { id: 'bm', label: 'Bambara' },
     { id: 'en', label: 'English' },
-    { id: 'fr', label: 'Français' },
-    { id: 'ha', label: 'Hausa' },
-    { id: 'sw', label: 'Swahili' },
-    { id: 'wo', label: 'Wolof' },
-    { id: 'yo', label: 'Yoruba' }
+    { id: 'fr', label: 'Français' }
   ];
 
   useEffect(() => {
@@ -169,6 +197,15 @@ export default function App() {
         }
       });
     }
+
+    // Request notifications permission on mount if enabled
+    if (notificationsEnabled && "Notification" in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission !== 'granted') {
+          setNotificationsEnabled(false);
+        }
+      });
+    }
   }, []);
 
   const saveToHistory = (result: AnalysisResult, image: string) => {
@@ -181,6 +218,20 @@ export default function App() {
     const updated = [newItem, ...history].slice(0, 50);
     setHistory(updated);
     localStorage.setItem('agri_scanner_history', JSON.stringify(updated));
+  };
+
+  const deleteFromHistory = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setItemToDelete(id);
+  };
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      const updated = history.filter(item => item.id !== itemToDelete);
+      setHistory(updated);
+      localStorage.setItem('agri_scanner_history', JSON.stringify(updated));
+      setItemToDelete(null);
+    }
   };
 
   const handleCapture = async (base64: string, mimeType: string) => {
@@ -205,7 +256,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-bg flex font-sans overflow-hidden relative">
+    <div className="h-svh bg-brand-bg flex font-sans overflow-hidden relative">
       {/* Mobile Sidebar Backrop */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -239,10 +290,10 @@ export default function App() {
         <SidebarContent />
       </aside>
 
-      <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
+      <div className="flex-1 flex flex-col h-full relative overflow-hidden">
         <div className="fixed inset-0 bg-pattern pointer-events-none z-0" />
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
-        <main className="w-full max-w-5xl px-6 pt-4 pb-8 mx-auto relative z-10">
+        <main className="flex-1 w-full max-w-5xl px-6 pt-4 pb-20 lg:pb-8 mx-auto relative z-10 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -252,29 +303,47 @@ export default function App() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="space-y-6"
+                  className="space-y-6 pb-4"
                 >
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
-                    <div className="max-w-xl">
-                      <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-2">
+                  <div className="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col group">
+                    <div className="p-8 pb-4 relative z-10">
+                      <h1 className="text-3xl font-black text-slate-900 mb-3">
                          {t.welcome}
                       </h1>
-                      <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                      <p className="text-base text-slate-500 font-medium leading-relaxed max-w-2xl text-balance">
                         {t.welcomeDesc}
                       </p>
                     </div>
-                    <div className="px-4 py-2 bg-brand/10 text-brand rounded-full text-[10px] font-bold uppercase tracking-widest">
-                       {t.multizone}
+                    <div className="w-full h-80 md:h-[450px] relative overflow-hidden bg-slate-100">
+                      <img 
+                        src="/assets/hero.png" 
+                        alt="African farmer checking crops with technology" 
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        referrerPolicy="no-referrer"
+                        onLoad={(e) => (e.currentTarget.parentElement!.style.backgroundColor = 'transparent')}
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-white/95 via-white/30 to-transparent"></div>
+                      
+                      {/* Floating Indicator Overlay */}
+                      <div className="absolute bottom-6 left-8 flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/50 shadow-lg">
+                        <span className="text-2xl">🌿</span>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-xs font-black text-slate-800 tracking-tight">VunaAI</p>
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {/* Weather Widget */}
-                    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-48 flex flex-col justify-between">
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2 max-w-[80%]">
                           <MapPin size={14} className="text-slate-400 shrink-0" />
-                          <h3 className="font-bold text-[10px] uppercase text-slate-400 tracking-wider truncate">
+                          <h3 className="font-bold text-[10px] uppercase text-slate-400 truncate">
                             {weather?.locationName || (t as any).weatherTitle || 'Météo Locale'}
                           </h3>
                         </div>
@@ -285,10 +354,22 @@ export default function App() {
                         )}
                       </div>
 
-                      {!weather && isLoadingWeather ? (
-                        <div className="py-4 space-y-2">
-                          <div className="h-8 w-24 bg-slate-50 animate-pulse rounded" />
-                          <div className="h-4 w-32 bg-slate-50 animate-pulse rounded" />
+                      {locationError ? (
+                        <div className="flex flex-col items-center justify-center -mt-8 text-center space-y-1">
+                          <MapPin size={24} className="text-slate-200 mb-1" />
+                          <p className="text-[10px] font-black text-slate-800 uppercase">{(t as any).locationError}</p>
+                          <p className="text-[9px] text-slate-500 font-medium px-2 leading-tight">{(t as any).locationErrorDesc}</p>
+                          <button 
+                            onClick={handleRequestLocation}
+                            className="mt-2 text-[10px] font-bold text-brand bg-brand/10 px-3 py-1.5 rounded-lg hover:bg-brand/20 transition-colors"
+                          >
+                            {(t as any).retry}
+                          </button>
+                        </div>
+                      ) : !weather && isLoadingWeather ? (
+                        <div className="flex flex-col items-center justify-center h-full -mt-8 space-y-3">
+                          <div className="w-8 h-8 border-2 border-brand/20 border-t-brand rounded-full animate-spin"></div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">Localisation...</p>
                         </div>
                       ) : weather ? (
                         <div className="space-y-4">
@@ -312,24 +393,21 @@ export default function App() {
 
                           <div className={`text-[10px] font-bold p-2 rounded-lg flex items-center gap-2 ${weather.isRaining ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
                              <Info size={12} />
-                             <span>
+                             <span className="truncate">
                                {weather.isRaining 
-                                 ? ((t as any).weatherWarning || 'Rain expected') 
-                                 : ((t as any).weatherGood || 'Ideal conditions')}
+                                 ? ((t as any).weatherWarning || 'Pluie prévue') 
+                                 : ((t as any).weatherGood || 'Conditions idéales')}
                              </span>
                           </div>
                         </div>
                       ) : (
-                        <div className="py-2">
-                          <p className="text-[10px] text-slate-400 mb-3">
-                            {locationError ? (t as any).locationDenied : (t as any).locationRequired}
-                          </p>
+                        <div className="flex flex-col items-center justify-center h-full -mt-8 text-center space-y-3">
+                          <MapPin size={24} className="text-slate-200" />
                           <button 
                             onClick={handleRequestLocation}
-                            className="w-full py-2 bg-brand/10 text-brand text-[10px] font-bold rounded-lg border border-brand/20 hover:bg-brand/20 transition-all flex items-center justify-center gap-2"
+                            className="text-[10px] font-black text-brand uppercase bg-brand/10 px-4 py-2 rounded-xl"
                           >
-                            <MapPin size={12} />
-                            {(t as any).enableLocation || 'Activer ma position'}
+                            Activer la météo
                           </button>
                         </div>
                       )}
@@ -349,12 +427,10 @@ export default function App() {
                         {t.scanCrop}
                       </button>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-48 flex flex-col justify-between md:col-span-2 lg:col-span-1">
                        <div className="flex justify-between items-center">
-                          <h3 className="font-bold text-xs uppercase text-slate-400 tracking-wider">{t.climateState}</h3>
+                          <h3 className="font-bold text-xs uppercase text-slate-400">{t.climateState}</h3>
                           <div className="w-2 h-2 rounded-full bg-emerald-400" />
                        </div>
                        <div>
@@ -375,7 +451,7 @@ export default function App() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="space-y-8"
+                  className="space-y-8 min-h-[60vh] flex flex-col items-center justify-center"
                 >
                   {!diagnosis && !isProcessing ? (
                     <div className="space-y-6 text-center">
@@ -391,9 +467,6 @@ export default function App() {
                   ) : isProcessing ? (
                     <div className="py-8 flex flex-col items-center">
                       <div className="mb-8 text-center">
-                        <div className="inline-block animate-bounce mb-3">
-                           <Sprout size={32} className="text-brand" />
-                        </div>
                         <h2 className="text-xl font-bold text-slate-900 mb-1">{t.analyzing}</h2>
                         <p className="text-xs text-slate-400 font-medium">{t.applyingContext}</p>
                       </div>
@@ -454,25 +527,44 @@ export default function App() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {history.map((item) => (
-                        <button
+                        <div
                           key={item.id}
                           onClick={() => {
                             setDiagnosis(item.result);
                             navigate('/scanner');
                           }}
-                          className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all text-left border border-slate-50 group"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              setDiagnosis(item.result);
+                              navigate('/scanner');
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all text-left border border-slate-50 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand/20"
                         >
                           <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 shadow-inner">
                             <img src={item.image} alt="Crop" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                           </div>
                           <div className="flex-grow">
-                            <p className="text-[9px] text-brand font-black uppercase tracking-widest mb-0.5">{item.date}</p>
-                            <h3 className="font-bold text-sm text-slate-900 mb-0.5">{item.result.commonName}</h3>
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="text-[9px] text-brand font-black uppercase mb-0.5">{item.date}</p>
+                                <h3 className="font-bold text-sm text-slate-900 mb-0.5">{item.result.commonName}</h3>
+                              </div>
+                              <button 
+                                onClick={(e) => deleteFromHistory(item.id, e)}
+                                className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                title="Supprimer"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
                             <div className={`w-fit text-[8px] px-2 py-0.5 rounded-full font-bold uppercase ${item.result.severity === 'critical' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}>
                               {item.result.severity}
                             </div>
                           </div>
-                        </button>
+                        </div>
                       ))}
                     </div>
                   )}
@@ -496,21 +588,60 @@ export default function App() {
                     </div>
                     <p className="text-xs text-slate-500 mb-6 font-medium">{t.calendarDesc}</p>
                     
-                    <div className="grid gap-3">
+                    {/* Region Tabs */}
+                    <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
                       {[
-                        { crop: (t as any).manioc, period: 'Mars - Juin', tip: 'Afrique Centrale / Ouest (Zones humides)', icon: '🌱' },
-                        { crop: (t as any).maize, period: 'Avril - Juillet', tip: 'Toute l\'Afrique Subsaharienne', icon: '🌽' },
-                        { crop: (t as any).sorghum, period: 'Juin - Août', tip: 'Zone Sahélienne / Afrique de l\'Est', icon: '🌾' },
-                        { crop: (t as any).peanut, period: 'Mai - Juillet', tip: 'Sénégal, Mali, Nigeria (Zones sèches)', icon: '🥜' },
-                        { crop: (t as any).cocoa, period: 'Sept - Nov', tip: 'Côte d\'Ivoire, Ghana, Cameroun', icon: '🍫' },
-                        { crop: (t as any).coffee, period: 'Oct - Jan', tip: 'Éthiopie, Kenya, Rwanda (Hautes terres)', icon: '☕' },
-                        { crop: (t as any).yam, period: 'Fév - Avr', tip: 'Bénin, Nigeria, Togo (Zone forêt)', icon: '🍠' },
-                        { crop: (t as any).cowpea, period: 'Juil - Sept', tip: 'Nigeria, Niger, Burkina Faso', icon: '🍲' },
-                        { crop: (t as any).rice, period: 'Juin - Sept', tip: 'Madagascar, Guinée, Sénégal (Bas-fonds)', icon: '🍚' },
-                        { crop: (t as any).plantain, period: 'Toute l\'année', tip: 'Afrique Centrale & Côte Atlantique', icon: '🍌' },
-                        { crop: (t as any).potato, period: 'Nov - Fév', tip: 'Afrique du Nord / Afrique du Sud', icon: '🥔' },
-                        { crop: (t as any).sweetPotato, period: 'Avril - Juin', tip: 'Afrique de l\'Est & Australe', icon: '🍠' }
-                      ].map((item, i) => (
+                        { id: 'East', label: (t as any).regionEast },
+                        { id: 'West', label: (t as any).regionWest },
+                        { id: 'Central', label: (t as any).regionCentral },
+                        { id: 'North', label: (t as any).regionNorth },
+                        { id: 'South', label: (t as any).regionSouth }
+                      ].map((region) => (
+                        <button
+                          key={region.id}
+                          onClick={() => setActiveRegion(region.id)}
+                          className={`px-4 py-2 rounded-full text-[10px] font-black whitespace-nowrap transition-all ${activeRegion === region.id ? 'bg-brand text-white shadow-md' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
+                        >
+                          {region.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="grid gap-3">
+                      {( ( {
+                        East: [
+                          { crop: (t as any).maize, period: 'Mars - Mai / Oct - Déc', tip: 'Deux saisons (Est de la RDC, Ouganda)', icon: '🌽' },
+                          { crop: (t as any).coffee, period: 'Avril - Juillet', tip: 'Kenya, Ouganda, Est de la RDC (Kivu)', icon: '☕' },
+                          { crop: (t as any).sorghum, period: 'Avril - Juin', tip: 'Zones semi-arides (Tanzanie, Soudan)', icon: '🌾' },
+                          { crop: (t as any).sweetPotato, period: 'Mars - Juin', tip: 'Région des Grands Lacs (Inclus Est RDC)', icon: '🍠' },
+                          { crop: (t as any).tea, period: 'Toute l\'année', tip: 'Récolte continue (Est RDC, Rwanda, Kenya)', icon: '🍃' }
+                        ],
+                        West: [
+                          { crop: (t as any).cocoa, period: 'Octobre - Décembre', tip: 'Côte d\'Ivoire, Ghana (Bassin forestier)', icon: '🍫' },
+                          { crop: (t as any).maize, period: 'Mars - Mai (Sud) / Mai - Juillet (Nord)', icon: '🌽', tip: 'Transition zone humide/aride' },
+                          { crop: (t as any).yam, period: 'Février - Avril', tip: 'Nigéria, Bénin (Ceinture de l\'igname)', icon: '🍠' },
+                          { crop: (t as any).millet, period: 'Juin - Août', tip: 'Zone Sahélienne (Sénégal, Mali, Niger)', icon: '🌾' },
+                          { crop: (t as any).peanut, period: 'Mai - Juillet', tip: 'Sénégal, Gambie, Guinée', icon: '🥜' }
+                        ],
+                        Central: [
+                          { crop: (t as any).manioc, period: 'Mars - Juin', tip: 'Culture de base (RDC, Congo, Cameroun)', icon: '🌱' },
+                          { crop: (t as any).plantain, period: 'Toute l\'année', tip: 'Zones forestières humides équatoriales', icon: '🍌' },
+                          { crop: (t as any).cocoa, period: 'Septembre - Novembre', tip: 'Cameroun, Gabon (Bassin du Congo)', icon: '🍫' },
+                          { crop: (t as any).palmOil, period: 'Toute l\'année', tip: 'Zone équatoriale (Récolte pic Fév-Mai)', icon: '🌴' }
+                        ],
+                        North: [
+                          { crop: (t as any).wheat, period: 'Novembre - Janvier', tip: 'Maghreb (Cultures d\'hiver irriguées)', icon: '🌾' },
+                          { crop: (t as any).olive, period: 'Octobre - Décembre', tip: 'Bassin méditerranéen (Tunisie, Maroc)', icon: '🫒' },
+                          { crop: (t as any).citrus, period: 'Novembre - Février', tip: 'Égypte, Maroc (Exportation)', icon: '🍊' },
+                          { crop: (t as any).dates, period: 'Août - Octobre', tip: 'Algérie, Égypte (Zones oasiennes)', icon: '🌴' }
+                        ],
+                        South: [
+                          { crop: (t as any).maize, period: 'Octobre - Décembre', tip: 'Afrique du Sud, Zambie, Zimbabwe', icon: '🌽' },
+                          { crop: (t as any).sunflower, period: 'Novembre - Janvier', tip: 'Rotation de cultures (Zone tempérée)', icon: '🌻' },
+                          { crop: (t as any).sugarCane, period: 'Avril - Juin', tip: 'KwaZulu-Natal, Maurice, Mozambique', icon: '🎋' },
+                          { crop: (t as any).grapes, period: 'Janvier - Mars', tip: 'Région du Cap (Afrique du Sud)', icon: '🍇' }
+                        ]
+                      } as any)[activeRegion] || [] ).map((item: any, i: number) => (
                         <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-brand/20 transition-all">
                           <div className="flex items-center gap-4">
                             <span className="text-2xl">{item.icon}</span>
@@ -526,10 +657,115 @@ export default function App() {
                   </div>
                 </motion.div>
               } />
+
+              <Route path="/settings" element={
+                <motion.div 
+                  key="settings"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  className="space-y-6 max-w-2xl mx-auto py-4"
+                >
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="p-2 bg-slate-100 text-slate-600 rounded-lg">
+                      <SettingsIcon size={20} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900">Paramètres</h2>
+                  </div>
+
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-slate-50">
+                      <h3 className="text-sm font-black text-slate-900 uppercase mb-4">Préférences</h3>
+                      <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">Langue de l'interface</p>
+                            <p className="text-xs text-slate-500">Choisir votre langue locale pour une meilleure expertise.</p>
+                          </div>
+                          <select 
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value as Language)}
+                            className="bg-slate-50 border border-slate-200 py-2 px-4 rounded-xl text-xs font-bold focus:outline-none focus:border-brand"
+                          >
+                            {languages.map(lang => (
+                              <option key={lang.id} value={lang.id}>{lang.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">Notifications de pluie</p>
+                            <p className="text-xs text-slate-500">Recevoir des alertes de précipitations pour vos semis.</p>
+                          </div>
+                          <div 
+                            onClick={handleToggleNotifications}
+                            className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ${notificationsEnabled ? 'bg-brand' : 'bg-slate-200'}`}
+                          >
+                            <motion.div 
+                              animate={{ x: notificationsEnabled ? 24 : 4 }}
+                              initial={false}
+                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                              className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 bg-slate-50/50">
+                      <h3 className="text-sm font-black text-slate-400 uppercase mb-4">À Propos</h3>
+                      <div className="space-y-4">
+                        <div className="flex justify-between text-xs font-medium">
+                          <span className="text-slate-500">Version</span>
+                          <span className="text-slate-900">0.1.0-alpha</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              } />
             </Routes>
           </AnimatePresence>
         </main>
       </div>
+
+      <AnimatePresence>
+        {itemToDelete && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden"
+            >
+              <div className="p-6 text-center">
+                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Supprimer le diagnostic ?</h3>
+                <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                  Cette action est irréversible. Voulez-vous vraiment supprimer cet ancien diagnostic de votre historique ?
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setItemToDelete(null)}
+                    className="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    className="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25 transition-all"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

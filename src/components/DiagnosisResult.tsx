@@ -49,7 +49,7 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
           
           {/* Simple Severity Gauge */}
           <div className="flex flex-col items-end gap-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Niveau de Gravité</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Niveau de Gravité</span>
             <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden flex">
               <motion.div 
                 initial={{ width: 0 }}
@@ -94,7 +94,7 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
                   {treatmentType === 'bio' ? <Leaf size={16} className="text-emerald-600" /> : <FlaskConical size={16} className="text-slate-600" />}
                   Action Recommandée
                 </h3>
-                <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest">{treatmentType === 'bio' ? 'Naturelle' : 'Matières Actives'}</p>
+                <p className="text-[9px] text-slate-400 uppercase font-black">{treatmentType === 'bio' ? 'Naturelle' : 'Matières Actives'}</p>
               </div>
             </div>
 
@@ -142,13 +142,13 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900">Conseils d'Espacement</h3>
-              <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest">Optimisation du Rendement</p>
+              <p className="text-[9px] text-slate-400 uppercase font-black">Optimisation du Rendement</p>
             </div>
           </div>
 
           <div className="bg-brand/5 p-4 rounded-xl border border-brand/10 text-center">
-            <p className="text-[10px] font-bold text-brand uppercase tracking-widest mb-1">Espacement Optimal</p>
-            <p className="text-xl font-black text-brand tracking-tight">{result.spacingAdvice.optimalSpacing}</p>
+            <p className="text-[10px] font-bold text-brand uppercase mb-1">Espacement Optimal</p>
+            <p className="text-xl font-black text-brand">{result.spacingAdvice.optimalSpacing}</p>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed italic border-l-2 border-slate-100 pl-3">
@@ -159,7 +159,7 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
               <div className="flex items-center gap-2 text-slate-400">
                 <CloudRain size={14} />
-                <span className="text-[9px] font-bold uppercase tracking-wider">Climat</span>
+                <span className="text-[9px] font-bold uppercase">Climat</span>
               </div>
               <p className="text-[10px] text-slate-600 leading-snug">{result.spacingAdvice.climateFactors}</p>
             </div>
@@ -167,7 +167,7 @@ export default function DiagnosisResult({ result }: DiagnosisResultProps) {
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
               <div className="flex items-center gap-2 text-slate-400">
                 <Layers size={14} />
-                <span className="text-[9px] font-bold uppercase tracking-wider">Sol</span>
+                <span className="text-[9px] font-bold uppercase">Sol</span>
               </div>
               <p className="text-[10px] text-slate-600 leading-snug">{result.spacingAdvice.soilTypeFactors}</p>
             </div>
