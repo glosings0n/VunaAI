@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import LanguageSelector from './components/LanguageSelector';
 import CameraCapture from './components/CameraCapture';
 import DiagnosisResult from './components/DiagnosisResult';
 import { analyzeCropPhoto, AnalysisResult } from './services/geminiService';
 import { motion, AnimatePresence } from 'motion/react';
-import { History, ChevronLeft, Calendar, Languages, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin, Sprout, Settings as SettingsIcon, Trash2, AlertTriangle } from 'lucide-react';
-import { translations, Language } from './constants/translations';
+import { History, ChevronLeft, Calendar, Languages, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin, Sprout, Settings as SettingsIcon, Trash2, AlertTriangle, Share2, FileDown, Globe } from 'lucide-react';
+import { translations, Language, languages } from './constants/translations';
 import { fetchLocalWeather, WeatherData } from './services/weatherService';
+import { downloadPDF, sharePDF } from './services/pdfService';
 import { Routes, Route, useNavigate, useLocation, NavLink, Navigate } from 'react-router-dom';
 
 interface ScanHistoryItem {
@@ -151,9 +153,19 @@ export default function App() {
           className={({ isActive }) => `hidden lg:flex w-full items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
           <SettingsIcon size={16} />
-          <span>Paramètres</span>
+          <span>{t.settings}</span>
         </NavLink>
       </nav>
+      
+      <div className="pt-4 border-t border-slate-50">
+        <label className="text-[8px] font-black text-slate-400 uppercase mb-2 block tracking-wider">{t.localLanguage}</label>
+        <LanguageSelector 
+          currentLanguage={language} 
+          onLanguageChange={setLanguage}
+          align="left"
+          className="mb-4"
+        />
+      </div>
 
       <div className="space-y-4 pt-4 border-t border-slate-50">
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
@@ -173,11 +185,6 @@ export default function App() {
       </div>
     </>
   );
-
-  const languages = [
-    { id: 'en', label: 'English' },
-    { id: 'fr', label: 'Français' }
-  ];
 
   useEffect(() => {
     const saved = localStorage.getItem('agri_scanner_history');
@@ -232,6 +239,16 @@ export default function App() {
       localStorage.setItem('agri_scanner_history', JSON.stringify(updated));
       setItemToDelete(null);
     }
+  };
+  
+  const handleShareResult = async (item: ScanHistoryItem | AnalysisResult) => {
+    const result = 'result' in item ? item.result : item;
+    await sharePDF(result, language);
+  };
+
+  const handleExportResult = (item: ScanHistoryItem | AnalysisResult) => {
+    const result = 'result' in item ? item.result : item;
+    downloadPDF(result, language);
   };
 
   const handleCapture = async (base64: string, mimeType: string) => {
@@ -292,7 +309,11 @@ export default function App() {
 
       <div className="flex-1 flex flex-col h-full relative overflow-hidden">
         <div className="fixed inset-0 bg-pattern pointer-events-none z-0" />
-        <Header onMenuClick={() => setIsSidebarOpen(true)} />
+        <Header 
+          onMenuClick={() => setIsSidebarOpen(true)} 
+          language={language}
+          onLanguageChange={setLanguage}
+        />
         <main className="flex-1 w-full max-w-5xl px-6 pt-4 pb-20 lg:pb-8 mx-auto relative z-10 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
@@ -306,15 +327,12 @@ export default function App() {
                   className="space-y-6 pb-4"
                 >
                   <div className="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col group">
-                    <div className="p-8 pb-4 relative z-10">
-                      <h1 className="text-3xl font-black text-slate-900 mb-3">
+                    <div className="p-6 pb-2 relative z-10">
+                      <h1 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">
                          {t.welcome}
                       </h1>
-                      <p className="text-base text-slate-500 font-medium leading-relaxed max-w-2xl text-balance">
-                        {t.welcomeDesc}
-                      </p>
                     </div>
-                    <div className="w-full h-80 md:h-[450px] relative overflow-hidden bg-slate-100">
+                    <div className="w-full h-64 md:h-[350px] relative overflow-hidden bg-slate-100">
                       <img 
                         src="/assets/hero.png" 
                         alt="African farmer checking crops with technology" 
@@ -325,15 +343,19 @@ export default function App() {
                       <div className="absolute inset-0 bg-linear-to-t from-white/95 via-white/30 to-transparent"></div>
                       
                       {/* Floating Indicator Overlay */}
-                      <div className="absolute bottom-6 left-8 flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/50 shadow-lg">
-                        <span className="text-2xl">🌿</span>
-                        <div>
+                      <button 
+                        onClick={() => navigate('/scanner')}
+                        className="absolute bottom-6 left-8 flex items-center gap-2 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/50 shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition-all group/vuna"
+                      >
+                        <span className="text-2xl group-hover/vuna:rotate-12 transition-transform">🌿</span>
+                        <div className="text-left">
                           <div className="flex items-center gap-1.5">
                             <p className="text-xs font-black text-slate-800 tracking-tight">VunaAI</p>
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                           </div>
+                          <p className="text-[10px] text-brand font-bold">{t.launchScan} →</p>
                         </div>
-                      </div>
+                      </button>
                     </div>
                   </div>
 
@@ -407,7 +429,7 @@ export default function App() {
                             onClick={handleRequestLocation}
                             className="text-[10px] font-black text-brand uppercase bg-brand/10 px-4 py-2 rounded-xl"
                           >
-                            Activer la météo
+                            {t.enableLocation}
                           </button>
                         </div>
                       )}
@@ -461,7 +483,7 @@ export default function App() {
                         </div>
                         <h2 className="text-xl font-bold text-slate-900 mb-2">{t.newAnalysis}</h2>
                         <p className="text-xs text-slate-500 mb-8">{t.newAnalysisDesc}</p>
-                        <CameraCapture onCapture={handleCapture} isProcessing={isProcessing} />
+                        <CameraCapture onCapture={handleCapture} isProcessing={isProcessing} language={language} />
                       </div>
                     </div>
                   ) : isProcessing ? (
@@ -501,7 +523,7 @@ export default function App() {
                       >
                         <ChevronLeft size={14} /> {t.redo}
                       </button>
-                      <DiagnosisResult result={diagnosis} />
+                      <DiagnosisResult result={diagnosis} language={language} />
                     </div>
                   )}
                 </motion.div>
@@ -552,13 +574,29 @@ export default function App() {
                                 <p className="text-[9px] text-brand font-black uppercase mb-0.5">{item.date}</p>
                                 <h3 className="font-bold text-sm text-slate-900 mb-0.5">{item.result.commonName}</h3>
                               </div>
-                              <button 
-                                onClick={(e) => deleteFromHistory(item.id, e)}
-                                className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                title="Supprimer"
-                              >
-                                <Trash2 size={14} />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleShareResult(item); }}
+                                  className="p-1.5 text-slate-300 hover:text-brand hover:bg-brand/5 rounded-lg transition-all"
+                                  title={t.share}
+                                >
+                                  <Share2 size={14} />
+                                </button>
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleExportResult(item); }}
+                                  className="p-1.5 text-slate-300 hover:text-brand hover:bg-brand/5 rounded-lg transition-all"
+                                  title={t.export}
+                                >
+                                  <FileDown size={14} />
+                                </button>
+                                <button 
+                                  onClick={(e) => deleteFromHistory(item.id, e)}
+                                  className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                  title="Supprimer"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
                             </div>
                             <div className={`w-fit text-[8px] px-2 py-0.5 rounded-full font-bold uppercase ${item.result.severity === 'critical' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}>
                               {item.result.severity}
@@ -670,33 +708,29 @@ export default function App() {
                     <div className="p-2 bg-slate-100 text-slate-600 rounded-lg">
                       <SettingsIcon size={20} />
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-900">Paramètres</h2>
+                    <h2 className="text-2xl font-bold text-slate-900">{t.settings}</h2>
                   </div>
 
                   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-slate-50">
-                      <h3 className="text-sm font-black text-slate-900 uppercase mb-4">Préférences</h3>
+                      <h3 className="text-sm font-black text-slate-900 uppercase mb-4">{t.preferences}</h3>
                       <div className="space-y-6">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-bold text-slate-800">Langue de l'interface</p>
-                            <p className="text-xs text-slate-500">Choisir votre langue locale pour une meilleure expertise.</p>
+                            <p className="text-sm font-bold text-slate-800">{t.localLanguage}</p>
+                            <p className="text-xs text-slate-500">{t.interfaceLanguageDesc}</p>
                           </div>
-                          <select 
-                            value={language}
-                            onChange={(e) => setLanguage(e.target.value as Language)}
-                            className="bg-slate-50 border border-slate-200 py-2 px-4 rounded-xl text-xs font-bold focus:outline-none focus:border-brand"
-                          >
-                            {languages.map(lang => (
-                              <option key={lang.id} value={lang.id}>{lang.label}</option>
-                            ))}
-                          </select>
+                          <LanguageSelector 
+                            currentLanguage={language} 
+                            onLanguageChange={setLanguage}
+                            className="w-48"
+                          />
                         </div>
                         
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-bold text-slate-800">Notifications de pluie</p>
-                            <p className="text-xs text-slate-500">Recevoir des alertes de précipitations pour vos semis.</p>
+                            <p className="text-sm font-bold text-slate-800">{t.rainNotifications}</p>
+                            <p className="text-xs text-slate-500">{t.rainNotificationsDesc}</p>
                           </div>
                           <div 
                             onClick={handleToggleNotifications}
@@ -714,10 +748,10 @@ export default function App() {
                     </div>
 
                     <div className="p-6 bg-slate-50/50">
-                      <h3 className="text-sm font-black text-slate-400 uppercase mb-4">À Propos</h3>
+                      <h3 className="text-sm font-black text-slate-400 uppercase mb-4">{t.about}</h3>
                       <div className="space-y-4">
                         <div className="flex justify-between text-xs font-medium">
-                          <span className="text-slate-500">Version</span>
+                          <span className="text-slate-500">{t.version}</span>
                           <span className="text-slate-900">0.1.0-alpha</span>
                         </div>
                       </div>
@@ -743,22 +777,22 @@ export default function App() {
                 <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <AlertTriangle size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Supprimer le diagnostic ?</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{t.deleteConfirmTitle}</h3>
                 <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                  Cette action est irréversible. Voulez-vous vraiment supprimer cet ancien diagnostic de votre historique ?
+                  {t.deleteConfirmDesc}
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setItemToDelete(null)}
                     className="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
                   >
-                    Annuler
+                    {t.cancel}
                   </button>
                   <button
                     onClick={confirmDelete}
                     className="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25 transition-all"
                   >
-                    Supprimer
+                    {t.delete}
                   </button>
                 </div>
               </div>

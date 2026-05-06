@@ -1,13 +1,16 @@
 import React, { useRef, useState } from 'react';
 import { Camera, Upload, RefreshCw, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { translations, Language } from '../constants/translations';
 
 interface CameraCaptureProps {
   onCapture: (base64: string, mimeType: string) => void;
   isProcessing: boolean;
+  language: Language;
 }
 
-export default function CameraCapture({ onCapture, isProcessing }: CameraCaptureProps) {
+export default function CameraCapture({ onCapture, isProcessing, language }: CameraCaptureProps) {
+  const t = translations[language];
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -29,14 +32,32 @@ export default function CameraCapture({ onCapture, isProcessing }: CameraCapture
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setIsCameraActive(true);
-      }
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
+      
+      setIsCameraActive(true);
+      
+      // Need to wait for next render cycle so video element is present
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+      
     } catch (err) {
       console.error("Error accessing camera:", err);
-      alert("Impossible d'accéder à la caméra. Vérifiez les permissions.");
+      const isDismissed = err instanceof Error && (err.message.includes('dismissed') || err.name === 'NotAllowedError');
+      
+      if (isDismissed) {
+        alert(t.cameraDeniedDesc);
+      } else {
+        alert(t.cameraErrorDesc);
+      }
     }
   };
 
@@ -92,7 +113,7 @@ export default function CameraCapture({ onCapture, isProcessing }: CameraCapture
               <div className="p-3 bg-white/20 rounded-lg group-hover:scale-105 transition-transform">
                 <Camera size={24} />
               </div>
-              <span className="font-bold text-sm">Scanner</span>
+              <span className="font-bold text-sm">{t.scannerTitle}</span>
             </button>
 
             <button
@@ -102,7 +123,7 @@ export default function CameraCapture({ onCapture, isProcessing }: CameraCapture
               <div className="p-3 bg-slate-100 rounded-lg group-hover:scale-105 transition-transform">
                 <Upload size={24} />
               </div>
-              <span className="font-bold text-sm">Importer</span>
+              <span className="font-bold text-sm">{t.importerTitle}</span>
               <input 
                 type="file" 
                 ref={fileInputRef} 
@@ -172,8 +193,8 @@ export default function CameraCapture({ onCapture, isProcessing }: CameraCapture
               {isProcessing && (
                 <div className="absolute inset-0 bg-brand/40 backdrop-blur-sm flex flex-col items-center justify-center text-white">
                   <RefreshCw className="animate-spin mb-4" size={48} />
-                  <p className="font-bold text-xl px-4 text-center">Analyse de la culture en cours...</p>
-                  <p className="text-sm opacity-80">Notre IA identifie les maladies</p>
+                  <p className="font-bold text-xl px-4 text-center">{t.scanningInProgress}</p>
+                  <p className="text-sm opacity-80">{t.scanningDesc}</p>
                 </div>
               )}
             </div>
