@@ -31,6 +31,13 @@ export default function App() {
     if (saved && (saved === 'fr' || saved === 'en' || saved === 'sw')) {
       return saved as Language;
     }
+    
+    // Fallback to browser language
+    const browserLang = navigator.language.split('-')[0];
+    if (browserLang === 'fr' || browserLang === 'en' || browserLang === 'sw') {
+      return browserLang as Language;
+    }
+    
     return 'fr';
   });
 
