@@ -115,9 +115,9 @@ export default function App() {
 
       <nav className="flex-1 space-y-1">
         <NavLink 
-          to="/dashboard"
+          to="/"
           onClick={() => { setDiagnosis(null); }}
-          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start cursor-pointer ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
           <LayoutDashboard size={20} className="lg:w-4 lg:h-4" />
           <span className="hidden lg:inline">{t.dashboard}</span>
@@ -125,28 +125,28 @@ export default function App() {
         <NavLink 
           to="/scanner"
           onClick={() => { setDiagnosis(null); }}
-          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start cursor-pointer ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
           <Camera size={20} className="lg:w-4 lg:h-4" />
           <span className="hidden lg:inline">{t.diagnostic}</span>
         </NavLink>
         <NavLink 
           to="/calendar"
-          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start cursor-pointer ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
           <Calendar size={20} className="lg:w-4 lg:h-4" />
           <span className="hidden lg:inline">{t.calendar}</span>
         </NavLink>
         <NavLink 
           to="/history"
-          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start cursor-pointer ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
           <History size={20} className="lg:w-4 lg:h-4" />
           <span className="hidden lg:inline">{t.history}</span>
         </NavLink>
         <NavLink 
           to="/settings"
-          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start cursor-pointer ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
           <SettingsIcon size={20} className="lg:w-4 lg:h-4" />
           <span className="hidden lg:inline">{t.settings}</span>
@@ -281,11 +281,10 @@ export default function App() {
           language={language}
           onLanguageChange={setLanguage}
         />
-        <main className="flex-1 w-full max-w-5xl px-6 pt-4 pb-24 md:pb-8 mx-auto relative z-10 overflow-y-auto overflow-x-hidden">
+        <main className="flex-1 w-full max-w-5xl px-6 pt-4 pb-28 md:pb-8 mx-auto relative z-10 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={
+              <Route path="/" element={
                 <motion.div
                   key="dashboard"
                   initial={{ opacity: 0, y: 10 }}
@@ -348,7 +347,7 @@ export default function App() {
                           <p className="text-[9px] font-black text-slate-800 uppercase">{(t as any).locationError}</p>
                           <button 
                             onClick={handleRequestLocation}
-                            className="mt-1 text-[8px] font-bold text-brand bg-brand/10 px-2 py-1 rounded-lg"
+                            className="mt-1 text-[8px] font-bold text-brand bg-brand/10 px-2 py-1 rounded-lg cursor-pointer"
                           >
                             {(t as any).retry}
                           </button>
@@ -389,7 +388,7 @@ export default function App() {
                         <div className="flex flex-col items-center justify-center h-full -mt-4 text-center">
                           <button 
                             onClick={handleRequestLocation}
-                            className="text-[9px] font-black text-brand uppercase bg-brand/10 px-3 py-2 rounded-xl"
+                            className="text-[9px] font-black text-brand uppercase bg-brand/10 px-3 py-2 rounded-xl cursor-pointer"
                           >
                             {t.enableLocation}
                           </button>
@@ -406,20 +405,23 @@ export default function App() {
                       </div>
                       <button 
                         onClick={() => navigate('/scanner')}
-                        className="relative z-10 bg-white text-brand px-4 py-2 rounded-lg text-[10px] font-bold w-fit hover:bg-slate-50 transition-all font-sans"
+                        className="relative z-10 bg-white text-brand px-4 py-2 rounded-lg text-[10px] font-bold w-fit hover:bg-slate-50 transition-all font-sans cursor-pointer"
                       >
                         {t.scanCrop}
                       </button>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-4 md:p-6 border border-slate-100 shadow-sm h-44 md:h-48 flex flex-col justify-between">
+                    <div 
+                      onClick={() => navigate('/calendar')}
+                      className="bg-white rounded-2xl p-4 md:p-6 border border-slate-100 shadow-sm h-44 md:h-48 flex flex-col justify-between cursor-pointer hover:border-brand/20 hover:shadow-md transition-all group"
+                    >
                        <div className="flex justify-between items-center">
-                          <h3 className="font-bold text-[9px] md:text-xs uppercase text-slate-400">{t.climateState}</h3>
+                          <h3 className="font-bold text-[9px] md:text-xs uppercase text-slate-400 group-hover:text-brand transition-colors">{t.climateState}</h3>
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                        </div>
                        <div>
                           <p className="text-[9px] md:text-[10px] text-slate-500 mb-2 line-clamp-2 md:line-clamp-none">{t.cropCycle}</p>
-                          <div className="flex items-center gap-1.5 text-[9px] md:text-[10px] text-brand bg-brand-light p-2 md:p-3 rounded-xl font-bold cursor-pointer hover:bg-brand-light/70" onClick={() => navigate('/calendar')}>
+                          <div className="flex items-center gap-1.5 text-[9px] md:text-[10px] text-brand bg-brand-light p-2 md:p-3 rounded-xl font-bold group-hover:bg-brand/10 transition-all">
                              <Calendar size={12} className="shrink-0" />
                              <span className="truncate">{t.consultCalendar}</span>
                           </div>
@@ -539,21 +541,21 @@ export default function App() {
                               <div className="flex items-center gap-1">
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleShareResult(item); }}
-                                  className="p-1.5 text-slate-300 hover:text-brand hover:bg-brand/5 rounded-lg transition-all"
+                                  className="p-1.5 text-slate-300 hover:text-brand hover:bg-brand/5 rounded-lg transition-all cursor-pointer"
                                   title={t.share}
                                 >
                                   <Share2 size={14} />
                                 </button>
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleExportResult(item); }}
-                                  className="p-1.5 text-slate-300 hover:text-brand hover:bg-brand/5 rounded-lg transition-all"
+                                  className="p-1.5 text-slate-300 hover:text-brand hover:bg-brand/5 rounded-lg transition-all cursor-pointer"
                                   title={t.export}
                                 >
                                   <FileDown size={14} />
                                 </button>
                                 <button 
                                   onClick={(e) => deleteFromHistory(item.id, e)}
-                                  className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                  className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
                                   title="Supprimer"
                                 >
                                   <Trash2 size={14} />
@@ -600,7 +602,7 @@ export default function App() {
                         <button
                           key={region.id}
                           onClick={() => setActiveRegion(region.id)}
-                          className={`px-4 py-2 rounded-full text-[10px] font-black whitespace-nowrap transition-all ${activeRegion === region.id ? 'bg-brand text-white shadow-md' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
+                          className={`px-4 py-2 rounded-full text-[10px] font-black whitespace-nowrap transition-all cursor-pointer ${activeRegion === region.id ? 'bg-brand text-white shadow-md' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
                         >
                           {region.label}
                         </button>
@@ -642,7 +644,7 @@ export default function App() {
                           { crop: (t as any).grapes, period: 'Janvier - Mars', tip: 'Région du Cap (Afrique du Sud)', icon: '🍇' }
                         ]
                       } as any)[activeRegion] || [] ).map((item: any, i: number) => (
-                        <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-brand/20 transition-all">
+                        <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-brand/20 transition-all cursor-pointer">
                           <div className="flex items-center gap-4">
                             <span className="text-2xl">{item.icon}</span>
                             <div>
@@ -677,15 +679,15 @@ export default function App() {
                     <div className="p-6 border-b border-slate-50">
                       <h3 className="text-sm font-black text-slate-900 uppercase mb-4">{t.preferences}</h3>
                       <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                          <div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex-1">
                             <p className="text-sm font-bold text-slate-800">{t.localLanguage}</p>
                             <p className="text-xs text-slate-500">{t.interfaceLanguageDesc}</p>
                           </div>
                           <LanguageSelector 
                             currentLanguage={language} 
                             onLanguageChange={setLanguage}
-                            className="w-48"
+                            className="w-20 md:w-48"
                           />
                         </div>
                         
@@ -726,40 +728,40 @@ export default function App() {
         </main>
 
         {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white/90 backdrop-blur-xl border border-slate-100 flex items-center justify-between p-2 px-6 rounded-3xl shadow-2xl z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex items-center justify-between px-6 py-3 pb-3 z-50">
           <NavLink 
-            to="/dashboard"
+            to="/"
             onClick={() => setDiagnosis(null)}
-            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all cursor-pointer ${isActive ? 'text-brand' : 'text-slate-400'}`}
           >
-            <LayoutDashboard size={22} strokeWidth={2.5} />
+            <LayoutDashboard size={24} strokeWidth={2.5} />
           </NavLink>
           <NavLink 
             to="/calendar"
-            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all cursor-pointer ${isActive ? 'text-brand' : 'text-slate-400'}`}
           >
-            <Calendar size={22} strokeWidth={2.5} />
+            <Calendar size={24} strokeWidth={2.5} />
           </NavLink>
           
           <NavLink 
             to="/scanner"
             onClick={() => setDiagnosis(null)}
-            className={({ isActive }) => `relative -top-6 w-14 h-14 flex items-center justify-center rounded-2xl shadow-xl transition-all duration-300 ${isActive ? 'bg-slate-900 text-white scale-110 shadow-slate-900/40' : 'bg-brand text-white shadow-brand/40 hover:scale-105 active:scale-95'}`}
+            className={({ isActive }) => `relative -top-5 w-14 h-14 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 cursor-pointer ${isActive ? 'bg-slate-900 text-white scale-110 shadow-slate-900/40' : 'bg-brand text-white shadow-brand/40'}`}
           >
             <Camera size={28} strokeWidth={2.5} />
           </NavLink>
 
           <NavLink 
             to="/history"
-            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all cursor-pointer ${isActive ? 'text-brand' : 'text-slate-400'}`}
           >
-            <History size={22} strokeWidth={2.5} />
+            <History size={24} strokeWidth={2.5} />
           </NavLink>
           <NavLink 
             to="/settings"
-            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all cursor-pointer ${isActive ? 'text-brand' : 'text-slate-400'}`}
           >
-            <SettingsIcon size={22} strokeWidth={2.5} />
+            <SettingsIcon size={24} strokeWidth={2.5} />
           </NavLink>
         </nav>
       </div>

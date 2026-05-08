@@ -64,14 +64,14 @@ export default function DiagnosisResult({ result, language }: DiagnosisResultPro
             <div className="flex items-center gap-2">
               <button 
                 onClick={handleShare}
-                className="p-2.5 bg-brand/10 text-brand rounded-xl hover:bg-brand/20 transition-all flex items-center gap-2 group/share"
+                className="p-2.5 bg-brand/10 text-brand rounded-xl hover:bg-brand/20 transition-all flex items-center gap-2 group/share cursor-pointer"
                 title={t.share}
               >
                 <Share2 size={18} className="group-hover/share:scale-110 transition-transform" />
               </button>
               <button 
                 onClick={handleExport}
-                className="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all flex items-center gap-2 group/export"
+                className="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all flex items-center gap-2 group/export cursor-pointer"
                 title={t.export}
               >
                 <FileDown size={18} className="group-hover/export:scale-110 transition-transform" />
@@ -100,10 +100,10 @@ export default function DiagnosisResult({ result, language }: DiagnosisResultPro
       </div>
 
       <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-lg">
-        <button onClick={() => setTreatmentType('bio')} className={`flex items-center justify-center gap-2 py-2 rounded-md transition-all text-xs font-bold ${treatmentType === 'bio' ? 'bg-white shadow-sm text-brand' : 'text-slate-500 hover:bg-slate-200'}`}>
+        <button onClick={() => setTreatmentType('bio')} className={`flex items-center justify-center gap-2 py-2 rounded-md transition-all text-xs font-bold cursor-pointer ${treatmentType === 'bio' ? 'bg-white shadow-sm text-brand' : 'text-slate-500 hover:bg-slate-200'}`}>
           <Leaf size={14} /> {t.treatmentBio}
         </button>
-        <button onClick={() => setTreatmentType('chemical')} className={`flex items-center justify-center gap-2 py-2 rounded-md transition-all text-xs font-bold ${treatmentType === 'chemical' ? 'bg-white shadow-sm text-brand-dark' : 'text-slate-500 hover:bg-slate-200'}`}>
+        <button onClick={() => setTreatmentType('chemical')} className={`flex items-center justify-center gap-2 py-2 rounded-md transition-all text-xs font-bold cursor-pointer ${treatmentType === 'chemical' ? 'bg-white shadow-sm text-brand-dark' : 'text-slate-500 hover:bg-slate-200'}`}>
           <FlaskConical size={14} /> {t.treatmentChemical}
         </button>
       </div>
@@ -210,14 +210,14 @@ export default function DiagnosisResult({ result, language }: DiagnosisResultPro
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="flex-1 py-4 bg-slate-900 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-sm"
+          className="flex-1 py-4 bg-slate-900 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-sm cursor-pointer"
         >
           {t.newAnalysisBtn}
           <ChevronRight size={14} />
         </button>
         <button
           onClick={() => navigate('/history')}
-          className="flex-1 py-4 bg-white text-slate-900 border border-slate-200 rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+          className="flex-1 py-4 bg-white text-slate-900 border border-slate-200 rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm cursor-pointer"
         >
           <History size={14} />
           {t.viewHistory}

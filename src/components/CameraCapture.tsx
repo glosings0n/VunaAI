@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Camera, Upload, RefreshCw, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { translations, Language } from '../constants/translations';
 
@@ -11,6 +12,7 @@ interface CameraCaptureProps {
 
 export default function CameraCapture({ onCapture, isProcessing, language }: CameraCaptureProps) {
   const t = translations[language];
+  const navigate = useNavigate();
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -108,7 +110,7 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
           >
             <button
               onClick={startCamera}
-              className="flex items-center gap-3 p-6 bg-brand text-white rounded-xl shadow-sm hover:bg-brand-dark transition-all group"
+              className="flex items-center gap-3 p-6 bg-brand text-white rounded-xl shadow-sm hover:bg-brand-dark transition-all group cursor-pointer"
             >
               <div className="p-3 bg-white/20 rounded-lg group-hover:scale-105 transition-transform">
                 <Camera size={24} />
@@ -118,7 +120,7 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
 
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-3 p-6 bg-white border border-slate-200 text-slate-700 rounded-xl shadow-sm hover:bg-slate-50 transition-all group"
+              className="flex items-center gap-3 p-6 bg-white border border-slate-200 text-slate-700 rounded-xl shadow-sm hover:bg-slate-50 transition-all group cursor-pointer"
             >
               <div className="p-3 bg-slate-100 rounded-lg group-hover:scale-105 transition-transform">
                 <Upload size={24} />
@@ -131,6 +133,13 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
                 accept="image/*" 
                 className="hidden" 
               />
+            </button>
+
+            <button
+              onClick={() => navigate('/history')}
+              className="col-span-2 mt-4 text-[11px] font-bold text-brand hover:text-brand-dark underline underline-offset-4 decoration-brand/30 hover:decoration-brand transition-all cursor-pointer opacity-80 hover:opacity-100 flex items-center justify-center gap-2"
+            >
+              {t.viewHistoryBtn}
             </button>
           </motion.div>
         )}
@@ -168,13 +177,13 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
               <button 
                 onClick={takePhoto}
                 disabled={isFlashing}
-                className="w-16 h-16 bg-white rounded-full border-4 border-slate-200 flex items-center justify-center shadow-lg active:scale-90 transition-transform disabled:opacity-50"
+                className="w-16 h-16 bg-white rounded-full border-4 border-slate-200 flex items-center justify-center shadow-lg active:scale-90 transition-transform disabled:opacity-50 cursor-pointer"
               >
                 <div className="w-12 h-12 bg-white rounded-full border-2 border-brand" />
               </button>
               <button 
                 onClick={reset}
-                className="absolute right-6 bottom-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white"
+                className="absolute right-6 bottom-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white cursor-pointer"
               >
                 <X size={24} />
               </button>
@@ -201,7 +210,7 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
             {!isProcessing && (
               <button 
                 onClick={reset}
-                className="absolute -top-3 -right-3 p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                className="absolute -top-3 -right-3 p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors cursor-pointer"
               >
                 <X size={20} />
               </button>

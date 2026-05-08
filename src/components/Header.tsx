@@ -12,7 +12,7 @@ export default function Header({ language, onLanguageChange }: HeaderProps) {
   const navigate = useNavigate();
 
   return (
-    <header className="w-full bg-white/50 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100 px-6 py-2 lg:hidden">
+    <header className="w-full bg-white/50 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100 px-6 py-5 lg:hidden">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xl md:hidden">🌿</span>
