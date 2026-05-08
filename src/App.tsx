@@ -28,7 +28,6 @@ export default function App() {
   const [history, setHistory] = useState<ScanHistoryItem[]>([]);
   const [language, setLanguage] = useState<Language>('fr');
   const [error, setError] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
   const [locationError, setLocationError] = useState<boolean>(false);
@@ -107,9 +106,9 @@ export default function App() {
 
   const SidebarContent = () => (
     <>
-      <div className="flex items-center gap-2 mb-8">
+      <div className="flex items-center gap-2 mb-8 lg:px-0 px-2 justify-center lg:justify-start">
         <span className="text-2xl">🌿</span>
-        <div>
+        <div className="hidden lg:block">
           <h1 className="text-lg font-extrabold text-slate-900">{t.appName}</h1>
         </div>
       </div>
@@ -117,47 +116,44 @@ export default function App() {
       <nav className="flex-1 space-y-1">
         <NavLink 
           to="/dashboard"
-          onClick={() => { setDiagnosis(null); setIsSidebarOpen(false); }}
-          className={({ isActive }) => `w-full flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          onClick={() => { setDiagnosis(null); }}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
-          <LayoutDashboard size={16} />
-          <span>{t.dashboard}</span>
+          <LayoutDashboard size={20} className="lg:w-4 lg:h-4" />
+          <span className="hidden lg:inline">{t.dashboard}</span>
         </NavLink>
         <NavLink 
           to="/scanner"
-          onClick={() => { setDiagnosis(null); setIsSidebarOpen(false); }}
-          className={({ isActive }) => `w-full flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          onClick={() => { setDiagnosis(null); }}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
-          <Camera size={16} />
-          <span>{t.diagnostic}</span>
+          <Camera size={20} className="lg:w-4 lg:h-4" />
+          <span className="hidden lg:inline">{t.diagnostic}</span>
         </NavLink>
         <NavLink 
           to="/calendar"
-          onClick={() => { setIsSidebarOpen(false); }}
-          className={({ isActive }) => `w-full flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
-          <Calendar size={16} />
-          <span>{t.calendar}</span>
+          <Calendar size={20} className="lg:w-4 lg:h-4" />
+          <span className="hidden lg:inline">{t.calendar}</span>
         </NavLink>
         <NavLink 
           to="/history"
-          onClick={() => { setIsSidebarOpen(false); }}
-          className={({ isActive }) => `w-full flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
-          <History size={16} />
-          <span>{t.history}</span>
+          <History size={20} className="lg:w-4 lg:h-4" />
+          <span className="hidden lg:inline">{t.history}</span>
         </NavLink>
         <NavLink 
           to="/settings"
-          onClick={() => { setIsSidebarOpen(false); }}
-          className={({ isActive }) => `hidden lg:flex w-full items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
+          className={({ isActive }) => `w-full flex items-center lg:gap-3 p-3 rounded-xl text-xs font-bold transition-all justify-center lg:justify-start ${isActive ? 'bg-slate-50 text-brand outline-1 outline-slate-100' : 'text-slate-400 hover:text-brand'}`}
         >
-          <SettingsIcon size={16} />
-          <span>{t.settings}</span>
+          <SettingsIcon size={20} className="lg:w-4 lg:h-4" />
+          <span className="hidden lg:inline">{t.settings}</span>
         </NavLink>
       </nav>
       
-      <div className="pt-4 border-t border-slate-50">
+      <div className="pt-4 border-t border-slate-50 lg:block hidden">
         <label className="text-[8px] font-black text-slate-400 uppercase mb-2 block tracking-wider">{t.localLanguage}</label>
         <LanguageSelector 
           currentLanguage={language} 
@@ -167,7 +163,7 @@ export default function App() {
         />
       </div>
 
-      <div className="space-y-4 pt-4 border-t border-slate-50">
+      <div className="space-y-4 pt-4 border-t border-slate-50 lg:block hidden">
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
           <p className="text-[8px] font-bold text-slate-400 uppercase mb-1">{t.offlineMode}</p>
           <p className="text-[10px] text-slate-500 mb-2 leading-snug">{t.offlineDesc}</p>
@@ -176,12 +172,12 @@ export default function App() {
              <span className="text-[10px] font-bold text-slate-600">{t.ready}</span>
           </div>
         </div>
+      </div>
 
-        <div className="pt-2 text-center">
-          <p className="text-[8px] text-slate-300 font-bold">
-            © {currentYear} LosingTech. All rights reserved.
-          </p>
-        </div>
+      <div className="pt-4 text-center">
+        <p className="text-[8px] text-slate-300 font-bold hidden lg:block">
+          © {currentYear} LosingTech. All rights reserved.
+        </p>
       </div>
     </>
   );
@@ -274,47 +270,18 @@ export default function App() {
 
   return (
     <div className="h-svh bg-brand-bg flex font-sans overflow-hidden relative">
-      {/* Mobile Sidebar Backrop */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[90] lg:hidden"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Drawer */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.aside 
-            initial={{ x: -280 }}
-            animate={{ x: 0 }}
-            exit={{ x: -280 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 bottom-0 w-[240px] bg-white z-[100] flex flex-col p-6 shadow-2xl lg:hidden"
-          >
-            <SidebarContent />
-          </motion.aside>
-        )}
-      </AnimatePresence>
-
-      {/* Desktop Sidebar */}
-      <aside className="w-60 bg-white border-r border-slate-100 hidden lg:flex flex-col p-6 space-y-6 z-20 overflow-y-auto">
+      {/* Desktop Sidebar (Medium = Rail, Large = Full) */}
+      <aside className="md:w-20 lg:w-60 bg-white border-r border-slate-100 hidden md:flex flex-col p-4 lg:p-6 space-y-6 z-20 overflow-y-auto transition-all duration-300">
         <SidebarContent />
       </aside>
 
       <div className="flex-1 flex flex-col h-full relative overflow-hidden">
         <div className="fixed inset-0 bg-pattern pointer-events-none z-0" />
         <Header 
-          onMenuClick={() => setIsSidebarOpen(true)} 
           language={language}
           onLanguageChange={setLanguage}
         />
-        <main className="flex-1 w-full max-w-5xl px-6 pt-4 pb-20 lg:pb-8 mx-auto relative z-10 overflow-y-auto overflow-x-hidden">
+        <main className="flex-1 w-full max-w-5xl px-6 pt-4 pb-24 md:pb-8 mx-auto relative z-10 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -359,75 +326,70 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     {/* Weather Widget */}
-                    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-48 flex flex-col justify-between">
-                      <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center gap-2 max-w-[80%]">
-                          <MapPin size={14} className="text-slate-400 shrink-0" />
-                          <h3 className="font-bold text-[10px] uppercase text-slate-400 truncate">
+                    <div className="bg-white rounded-2xl p-4 md:p-6 border border-slate-100 shadow-sm h-44 md:h-48 flex flex-col justify-between">
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center gap-1.5 max-w-[85%]">
+                          <MapPin size={12} className="text-slate-400 shrink-0" />
+                          <h3 className="font-bold text-[9px] md:text-[10px] uppercase text-slate-400 truncate">
                             {weather?.locationName || (t as any).weatherTitle || 'Météo Locale'}
                           </h3>
                         </div>
                         {weather?.isRaining ? (
-                          <CloudRain size={18} className="text-blue-500 animate-bounce" />
+                          <CloudRain size={16} className="text-blue-500 shrink-0" />
                         ) : (
-                          <Sun size={18} className="text-orange-400 animate-pulse" />
+                          <Sun size={16} className="text-orange-400 shrink-0" />
                         )}
                       </div>
 
                       {locationError ? (
-                        <div className="flex flex-col items-center justify-center -mt-8 text-center space-y-1">
-                          <MapPin size={24} className="text-slate-200 mb-1" />
-                          <p className="text-[10px] font-black text-slate-800 uppercase">{(t as any).locationError}</p>
-                          <p className="text-[9px] text-slate-500 font-medium px-2 leading-tight">{(t as any).locationErrorDesc}</p>
+                        <div className="flex flex-col items-center justify-center -mt-4 text-center space-y-1">
+                          <p className="text-[9px] font-black text-slate-800 uppercase">{(t as any).locationError}</p>
                           <button 
                             onClick={handleRequestLocation}
-                            className="mt-2 text-[10px] font-bold text-brand bg-brand/10 px-3 py-1.5 rounded-lg hover:bg-brand/20 transition-colors"
+                            className="mt-1 text-[8px] font-bold text-brand bg-brand/10 px-2 py-1 rounded-lg"
                           >
                             {(t as any).retry}
                           </button>
                         </div>
                       ) : !weather && isLoadingWeather ? (
-                        <div className="flex flex-col items-center justify-center h-full -mt-8 space-y-3">
-                          <div className="w-8 h-8 border-2 border-brand/20 border-t-brand rounded-full animate-spin"></div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase">Localisation...</p>
+                        <div className="flex flex-col items-center justify-center h-full -mt-4">
+                          <div className="w-6 h-6 border-2 border-brand/20 border-t-brand rounded-full animate-spin"></div>
                         </div>
                       ) : weather ? (
-                        <div className="space-y-4">
-                          <div className="flex items-end gap-2">
-                            <span className="text-3xl font-black text-slate-900 leading-none">
+                        <div className="space-y-3">
+                          <div className="flex items-end gap-1.5">
+                            <span className="text-2xl md:text-3xl font-black text-slate-900 leading-none">
                               {Math.round(weather.temperature)}°C
                             </span>
-                            <span className="text-xs text-slate-400 font-bold mb-1">{(t as any).temperature || 'Temp'}</span>
                           </div>
                           
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1.5">
-                              <Droplets size={12} className="text-blue-400" />
-                              <span className="text-[10px] font-bold text-slate-600">{weather.humidity}%</span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1">
+                              <Droplets size={10} className="text-blue-400" />
+                              <span className="text-[9px] font-bold text-slate-600">{weather.humidity}%</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <CloudRain size={12} className="text-slate-400" />
-                              <span className="text-[10px] font-bold text-slate-600">{weather.precipitation}mm</span>
+                            <div className="flex items-center gap-1">
+                              <CloudRain size={10} className="text-slate-400" />
+                              <span className="text-[9px] font-bold text-slate-600">{weather.precipitation}mm</span>
                             </div>
                           </div>
 
-                          <div className={`text-[10px] font-bold p-2 rounded-lg flex items-center gap-2 ${weather.isRaining ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                             <Info size={12} />
+                          <div className={`text-[8px] md:text-[9px] font-bold p-1.5 rounded-lg flex items-center gap-1.5 ${weather.isRaining ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                             <Info size={10} className="shrink-0" />
                              <span className="truncate">
                                {weather.isRaining 
-                                 ? ((t as any).weatherWarning || 'Pluie prévue') 
-                                 : ((t as any).weatherGood || 'Conditions idéales')}
+                                 ? ((t as any).weatherWarning || 'Pluie') 
+                                 : ((t as any).weatherGood || 'Beau temps')}
                              </span>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center h-full -mt-8 text-center space-y-3">
-                          <MapPin size={24} className="text-slate-200" />
+                        <div className="flex flex-col items-center justify-center h-full -mt-4 text-center">
                           <button 
                             onClick={handleRequestLocation}
-                            className="text-[10px] font-black text-brand uppercase bg-brand/10 px-4 py-2 rounded-xl"
+                            className="text-[9px] font-black text-brand uppercase bg-brand/10 px-3 py-2 rounded-xl"
                           >
                             {t.enableLocation}
                           </button>
@@ -435,7 +397,7 @@ export default function App() {
                       )}
                     </div>
 
-                    <div className="bg-brand rounded-2xl p-6 text-white relative overflow-hidden shadow-sm h-48 flex flex-col justify-between">
+                    <div className="hidden lg:flex bg-brand rounded-2xl p-6 text-white relative overflow-hidden shadow-sm h-48 flex-col justify-between">
                       <div className="relative z-10">
                         <h2 className="text-xl font-bold mb-2">{t.smartDiag}</h2>
                         <p className="opacity-90 text-xs leading-relaxed max-w-[200px]">
@@ -450,16 +412,16 @@ export default function App() {
                       </button>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-48 flex flex-col justify-between md:col-span-2 lg:col-span-1">
+                    <div className="bg-white rounded-2xl p-4 md:p-6 border border-slate-100 shadow-sm h-44 md:h-48 flex flex-col justify-between">
                        <div className="flex justify-between items-center">
-                          <h3 className="font-bold text-xs uppercase text-slate-400">{t.climateState}</h3>
-                          <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                          <h3 className="font-bold text-[9px] md:text-xs uppercase text-slate-400">{t.climateState}</h3>
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                        </div>
                        <div>
-                          <p className="text-[10px] text-slate-500 mb-2">{t.cropCycle}</p>
-                          <div className="flex items-center gap-2 text-[10px] text-brand bg-brand-light p-3 rounded-xl font-bold cursor-pointer hover:bg-brand-light/70" onClick={() => navigate('/calendar')}>
-                             <Calendar size={14} />
-                             <span>{t.consultCalendar}</span>
+                          <p className="text-[9px] md:text-[10px] text-slate-500 mb-2 line-clamp-2 md:line-clamp-none">{t.cropCycle}</p>
+                          <div className="flex items-center gap-1.5 text-[9px] md:text-[10px] text-brand bg-brand-light p-2 md:p-3 rounded-xl font-bold cursor-pointer hover:bg-brand-light/70" onClick={() => navigate('/calendar')}>
+                             <Calendar size={12} className="shrink-0" />
+                             <span className="truncate">{t.consultCalendar}</span>
                           </div>
                        </div>
                     </div>
@@ -762,6 +724,42 @@ export default function App() {
             </Routes>
           </AnimatePresence>
         </main>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-100 flex items-center justify-around p-3 pb-8 z-50">
+          <NavLink 
+            to="/dashboard"
+            onClick={() => setDiagnosis(null)}
+            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+          >
+            <LayoutDashboard size={24} />
+          </NavLink>
+          <NavLink 
+            to="/scanner"
+            onClick={() => setDiagnosis(null)}
+            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+          >
+            <Camera size={24} />
+          </NavLink>
+          <NavLink 
+            to="/calendar"
+            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+          >
+            <Calendar size={24} />
+          </NavLink>
+          <NavLink 
+            to="/history"
+            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+          >
+            <History size={24} />
+          </NavLink>
+          <NavLink 
+            to="/settings"
+            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+          >
+            <SettingsIcon size={24} />
+          </NavLink>
+        </nav>
       </div>
 
       <AnimatePresence>

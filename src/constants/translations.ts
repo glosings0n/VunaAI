@@ -119,7 +119,8 @@ export const translations = {
     newAnalysisBtn: "Lancer une nouvelle analyse",
     pdfReportTitle: "Rapport Diagnostic",
     producedBy: "Produit par VunaAI",
-    sharePdfText: "Diagnostic VunaAI pour {name}"
+    sharePdfText: "Diagnostic VunaAI pour {name}",
+    viewHistory: "Voir l'historique"
   },
   en: {
     appName: "VunaAI",
@@ -241,7 +242,8 @@ export const translations = {
     newAnalysisBtn: "Launch a new analysis",
     pdfReportTitle: "Diagnostic Report",
     producedBy: "Produced by VunaAI",
-    sharePdfText: "VunaAI Diagnosis for {name}"
+    sharePdfText: "VunaAI Diagnosis for {name}",
+    viewHistory: "View History"
   },
   sw: {
     appName: "VunaAI",
@@ -363,7 +365,8 @@ export const translations = {
     newAnalysisBtn: "Anza uchambuzi mpya",
     pdfReportTitle: "Ripoti ya Uchunguzi",
     producedBy: "Imetolewa na VunaAI",
-    sharePdfText: "Uchunguzi wa VunaAI kwa {name}"
+    sharePdfText: "Uchunguzi wa VunaAI kwa {name}",
+    viewHistory: "Angalia Historia"
   }
 };
 

@@ -7,6 +7,7 @@ interface LanguageSelectorProps {
   currentLanguage: Language;
   onLanguageChange: (lang: Language) => void;
   align?: 'left' | 'right';
+  compact?: boolean;
   className?: string;
 }
 
@@ -14,6 +15,7 @@ export default function LanguageSelector({
   currentLanguage, 
   onLanguageChange, 
   align = 'right',
+  compact = false,
   className = ""
 }: LanguageSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +45,9 @@ export default function LanguageSelector({
             alt={currentLang.name}
             className="w-4 h-3 object-cover rounded-sm shadow-xs"
           />
-          <span className="text-[10px] font-black text-slate-600 uppercase">{currentLang.name}</span>
+          <span className="text-[10px] font-black text-slate-600 uppercase">
+            {compact ? currentLang.code : currentLang.name}
+          </span>
         </div>
         <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>

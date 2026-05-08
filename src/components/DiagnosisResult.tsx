@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ShieldCheck, FlaskConical, Info, AlertTriangle, CheckCircle2, ChevronRight, Leaf, Maximize, CloudRain, Layers, Share2, FileDown } from 'lucide-react';
+import { ShieldCheck, FlaskConical, Info, AlertTriangle, CheckCircle2, ChevronRight, Leaf, Maximize, CloudRain, Layers, Share2, FileDown, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
+import { useNavigate } from 'react-router-dom';
 import { AnalysisResult } from '../services/geminiService';
 import { translations, Language } from '../constants/translations';
 import { downloadPDF, sharePDF } from '../services/pdfService';
@@ -12,6 +13,7 @@ interface DiagnosisResultProps {
 }
 
 export default function DiagnosisResult({ result, language }: DiagnosisResultProps) {
+  const navigate = useNavigate();
   const t = translations[language];
   const [treatmentType, setTreatmentType] = useState<'bio' | 'chemical'>('bio');
 
@@ -205,13 +207,22 @@ export default function DiagnosisResult({ result, language }: DiagnosisResultPro
         </div>
       )}
 
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="w-full py-4 bg-slate-900 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-sm"
-      >
-        {t.newAnalysisBtn}
-        <ChevronRight size={14} />
-      </button>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="flex-1 py-4 bg-slate-900 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-sm"
+        >
+          {t.newAnalysisBtn}
+          <ChevronRight size={14} />
+        </button>
+        <button
+          onClick={() => navigate('/history')}
+          className="flex-1 py-4 bg-white text-slate-900 border border-slate-200 rounded-lg font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+        >
+          <History size={14} />
+          {t.viewHistory}
+        </button>
+      </div>
     </motion.div>
   );
 }
