@@ -726,38 +726,40 @@ export default function App() {
         </main>
 
         {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-100 flex items-center justify-around p-3 pb-8 z-50">
+        <nav className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white/90 backdrop-blur-xl border border-slate-100 flex items-center justify-between p-2 px-6 rounded-3xl shadow-2xl z-50">
           <NavLink 
             to="/dashboard"
             onClick={() => setDiagnosis(null)}
-            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
           >
-            <LayoutDashboard size={24} />
-          </NavLink>
-          <NavLink 
-            to="/scanner"
-            onClick={() => setDiagnosis(null)}
-            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
-          >
-            <Camera size={24} />
+            <LayoutDashboard size={22} strokeWidth={2.5} />
           </NavLink>
           <NavLink 
             to="/calendar"
-            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
           >
-            <Calendar size={24} />
+            <Calendar size={22} strokeWidth={2.5} />
           </NavLink>
+          
+          <NavLink 
+            to="/scanner"
+            onClick={() => setDiagnosis(null)}
+            className={({ isActive }) => `relative -top-6 w-14 h-14 flex items-center justify-center rounded-2xl shadow-xl transition-all duration-300 ${isActive ? 'bg-slate-900 text-white scale-110 shadow-slate-900/40' : 'bg-brand text-white shadow-brand/40 hover:scale-105 active:scale-95'}`}
+          >
+            <Camera size={28} strokeWidth={2.5} />
+          </NavLink>
+
           <NavLink 
             to="/history"
-            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
           >
-            <History size={24} />
+            <History size={22} strokeWidth={2.5} />
           </NavLink>
           <NavLink 
             to="/settings"
-            className={({ isActive }) => `p-2 rounded-xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
+            className={({ isActive }) => `p-2.5 rounded-2xl transition-all ${isActive ? 'text-brand bg-brand/5' : 'text-slate-400'}`}
           >
-            <SettingsIcon size={24} />
+            <SettingsIcon size={22} strokeWidth={2.5} />
           </NavLink>
         </nav>
       </div>
