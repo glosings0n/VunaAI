@@ -26,7 +26,17 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [diagnosis, setDiagnosis] = useState<AnalysisResult | null>(null);
   const [history, setHistory] = useState<ScanHistoryItem[]>([]);
-  const [language, setLanguage] = useState<Language>('fr');
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('vuna_language');
+    if (saved && (saved === 'fr' || saved === 'en' || saved === 'sw')) {
+      return saved as Language;
+    }
+    return 'fr';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('vuna_language', language);
+  }, [language]);
   const [error, setError] = useState<string | null>(null);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
@@ -723,6 +733,8 @@ export default function App() {
                   </div>
                 </motion.div>
               } />
+
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AnimatePresence>
         </main>
