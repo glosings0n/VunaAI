@@ -121,7 +121,8 @@ export const translations = {
     producedBy: "Produit par VunaAI",
     sharePdfText: "Diagnostic VunaAI pour {name}",
     viewHistory: "Voir l'historique",
-    viewHistoryBtn: "Voir les historiques"
+    viewHistoryBtn: "Voir les historiques",
+    submitAnalysis: "Lancer l'analyse"
   },
   en: {
     appName: "VunaAI",
@@ -245,7 +246,8 @@ export const translations = {
     producedBy: "Produced by VunaAI",
     sharePdfText: "VunaAI Diagnosis for {name}",
     viewHistory: "View History",
-    viewHistoryBtn: "View history"
+    viewHistoryBtn: "View history",
+    submitAnalysis: "Launch analysis"
   },
   sw: {
     appName: "VunaAI",
@@ -369,7 +371,8 @@ export const translations = {
     producedBy: "Imetolewa na VunaAI",
     sharePdfText: "Uchunguzi wa VunaAI kwa {name}",
     viewHistory: "Angalia Historia",
-    viewHistoryBtn: "Angalia historia"
+    viewHistoryBtn: "Angalia historia",
+    submitAnalysis: "Anza uchambuzi"
   }
 };
 

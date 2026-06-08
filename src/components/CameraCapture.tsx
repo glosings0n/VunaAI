@@ -14,6 +14,7 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
   const t = translations[language];
   const navigate = useNavigate();
   const [preview, setPreview] = useState<string | null>(null);
+  const [mimeType, setMimeType] = useState<string>('image/jpeg');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -26,7 +27,7 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
       reader.onloadend = () => {
         const base64 = reader.result as string;
         setPreview(base64);
-        onCapture(base64, file.type);
+        setMimeType(file.type);
       };
       reader.readAsDataURL(file);
     }
@@ -82,9 +83,9 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
         stream?.getTracks().forEach(track => track.stop());
         
         setPreview(base64);
+        setMimeType('image/jpeg');
         setIsCameraActive(false);
         setIsFlashing(false);
-        onCapture(base64, 'image/jpeg');
       }, 200);
     }
   };
@@ -195,9 +196,9 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative"
+            className="space-y-4"
           >
-            <div className="rounded-3xl overflow-hidden shadow-2xl bg-white aspect-square md:aspect-video">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white aspect-square md:aspect-video">
               <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               {isProcessing && (
                 <div className="absolute inset-0 bg-brand/40 backdrop-blur-sm flex flex-col items-center justify-center text-white">
@@ -208,12 +209,24 @@ export default function CameraCapture({ onCapture, isProcessing, language }: Cam
               )}
             </div>
             {!isProcessing && (
-              <button 
-                onClick={reset}
-                className="absolute -top-3 -right-3 p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors cursor-pointer"
-              >
-                <X size={20} />
-              </button>
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="py-4 px-6 bg-white border border-slate-200 text-slate-700 rounded-xl font-extrabold text-xs hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <X size={16} />
+                  {t.cancel}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onCapture(preview, mimeType)}
+                  className="py-4 px-6 bg-brand text-white rounded-xl font-extrabold text-xs hover:bg-brand-dark transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md shadow-brand/20 active:scale-95"
+                >
+                  <RefreshCw size={16} className="animate-pulse" />
+                  {t.submitAnalysis}
+                </button>
+              </div>
             )}
           </motion.div>
         )}
