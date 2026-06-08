@@ -5,7 +5,7 @@ import CameraCapture from './components/CameraCapture';
 import DiagnosisResult from './components/DiagnosisResult';
 import { analyzeCropPhoto, AnalysisResult } from './services/geminiService';
 import { motion, AnimatePresence } from 'motion/react';
-import { History, ChevronLeft, Calendar, Languages, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin, Sprout, Settings as SettingsIcon, Trash2, AlertTriangle, Share2, FileDown, Globe, X } from 'lucide-react';
+import { History, ChevronLeft, Calendar, Languages, Info, Sun, LayoutDashboard, Camera, CameraOff, CloudRain, Thermometer, Droplets, MapPin, Sprout, Settings as SettingsIcon, Trash2, AlertTriangle, Share2, FileDown, Globe, X } from 'lucide-react';
 import { translations, Language, languages } from './constants/translations';
 import { fetchLocalWeather, WeatherData } from './services/weatherService';
 import { downloadPDF, sharePDF } from './services/pdfService';
@@ -449,93 +449,242 @@ export default function App() {
               } />
 
               <Route path="/scanner" element={
-                <motion.div
-                  key="scanner"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-8 min-h-[60vh] flex flex-col items-center justify-center w-full"
-                >
-                  {error && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="w-full max-w-md bg-red-50 border border-red-100 rounded-3xl p-6 text-center space-y-4 shadow-xs relative overflow-hidden"
+                (() => {
+                  const errorTranslations = {
+                    fr: {
+                      notPlantTitle: "Image non conforme (Plante non détectée)",
+                      generalTitle: "Échec de l'analyse de l'image",
+                      recommendationsTitle: "Recommandations VunaAI :",
+                      newScanBtn: "Faire un nouveau scan",
+                      notPlantTips: [
+                        {
+                          title: "Ciblez les cultures uniquement",
+                          desc: "VunaAI est conçu uniquement pour analyser les plantes, feuilles, tiges ou fruits (comme le maïs, manioc, café, banane...).",
+                        },
+                        {
+                          title: "Pas d'animaux ou d'humains",
+                          desc: "Évitez d'inclure des visages, d'autres personnes, des animaux domestiques ou des objets ménagers.",
+                        },
+                        {
+                          title: "Évitez les produits cuisinés ou altérés",
+                          desc: "Les plats préparés ou les fruits mixés ne sont pas analysables par le modèle agronomique.",
+                        }
+                      ],
+                      generalTips: [
+                        {
+                          title: "Rapprochez-vous de la cible",
+                          desc: "Placez la feuille infectée ou le fruit malade bien au centre, à environ 15-30 cm de la caméra.",
+                        },
+                        {
+                          title: "Optimisez la luminosité",
+                          desc: "Assurez-vous qu'il y ait assez de lumière du jour naturelle, sans ombres dures ni reflets directs.",
+                        },
+                        {
+                          title: "Lentille propre et stable",
+                          desc: "Nettoyez votre caméra avant de prendre la photo et tenez l'appareil bien stable pour éviter le flou de bougé.",
+                        }
+                      ]
+                    },
+                    en: {
+                      notPlantTitle: "Crops or plants not recognized",
+                      generalTitle: "Image analysis failed",
+                      recommendationsTitle: "VunaAI Recommendations:",
+                      newScanBtn: "Start a new scan",
+                      notPlantTips: [
+                        {
+                          title: "Target crops only",
+                          desc: "VunaAI is designed to analyze crops, leaves, stems, or fruits (e.g., maize, cassava, plantain, coffee...).",
+                        },
+                        {
+                          title: "No humans or animals",
+                          desc: "Do not include faces, other people, livestock, pets, or everyday household objects.",
+                        },
+                        {
+                          title: "No cooked or blended meals",
+                          desc: "Prepared dishes, cooked meals, or juice mixes cannot be processed by the agronomist model.",
+                        }
+                      ],
+                      generalTips: [
+                        {
+                          title: "Get closer to the leaf",
+                          desc: "Place the diseased leaf or lesion directly in the center, about 15-30 cm away.",
+                        },
+                        {
+                          title: "Ensure adequate light",
+                          desc: "Make sure there is clear daylight, and avoid heavy shade underneath trees or lens flare.",
+                        },
+                        {
+                          title: "Clean and steady camera",
+                          desc: "Wipe your lens clean and hold the device steady to avoid motion blur on fine plant veins.",
+                        }
+                      ]
+                    },
+                    sw: {
+                      notPlantTitle: "Zao au mmea haukutambuliwa",
+                      generalTitle: "Uchambuzi wa picha umeshindwa",
+                      recommendationsTitle: "Mapendekezo ya VunaAI:",
+                      newScanBtn: "Anza uchambuzi mpya",
+                      notPlantTips: [
+                        {
+                          title: "Lenga mimea na mazao tu",
+                          desc: "VunaAI imeundwa tu kuchambua mimea, majani, au matunda (kama vile mahindi, muhogo, ndizi, kahawa...).",
+                        },
+                        {
+                          title: "Hakuna watu au wanyama",
+                          desc: "Usijumuishe sura za watu, wanyama wa kufugwa, au vitu vya kawaida vya nyumbani.",
+                        },
+                        {
+                          title: "Hakuna chakula kilichopikwa",
+                          desc: "Chakula kilichopikwa tayari hakitambuliwi na mfano huu wa kitaalamu wa kilimo.",
+                        }
+                      ],
+                      generalTips: [
+                        {
+                          title: "Sogea karibu zaidi",
+                          desc: "Weka jani lililoathirika katikati haswa ya picha, umbali wa sentimita 15-30 hivi.",
+                        },
+                        {
+                          title: "Boresha mwanga wa jua",
+                          desc: "Hakikisha kuna mwanga mzuri wa mchana, na uepuke vivuli vikubwa au mionzi ya moja kwa moja ya jua kali.",
+                        },
+                        {
+                          title: "Lensi safi na thabiti",
+                          desc: "Safisha lenzi ya kamera yako na ushike kifaa vizuri bila kutetemeka ili kuepuka ukungu.",
+                        }
+                      ]
+                    }
+                  };
+
+                  const isNotPlantError = error && (
+                    error.toLowerCase().includes("plante") ||
+                    error.toLowerCase().includes("plant") ||
+                    error.toLowerCase().includes("mmea") ||
+                    error.toLowerCase().includes("jani") ||
+                    error.toLowerCase().includes("tunda") ||
+                    error.toLowerCase().includes("fruit") ||
+                    error.toLowerCase().includes("crop") ||
+                    error.toLowerCase().includes("culture")
+                  );
+
+                  const errTrans = errorTranslations[language] || errorTranslations.fr;
+                  const tipsToUse = isNotPlantError ? errTrans.notPlantTips : errTrans.generalTips;
+                  const errorTitle = isNotPlantError ? errTrans.notPlantTitle : errTrans.generalTitle;
+
+                  return (
+                    <motion.div
+                      key="scanner"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="space-y-8 min-h-[60vh] flex flex-col items-center justify-center w-full"
                     >
-                      <div className="absolute top-3 right-3">
-                        <button 
-                          onClick={() => setError(null)}
-                          className="p-1.5 text-red-400 hover:text-red-500 rounded-full hover:bg-red-100/50 transition-all cursor-pointer flex items-center justify-center"
+                      {error ? (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="w-full max-w-lg bg-white rounded-3xl p-6 md:p-8 text-center space-y-6 border border-slate-100 shadow-xl relative overflow-hidden"
                         >
-                          <X size={16} />
-                        </button>
-                      </div>
-                      <div className="w-12 h-12 bg-red-100/80 text-red-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
-                        <AlertTriangle size={24} />
-                      </div>
-                      <div className="space-y-1.5">
-                        <p className="text-[10px] font-black uppercase text-red-500 tracking-wider">
-                          {language === 'sw' ? 'Hitilafu ya Uchambuzi' : language === 'en' ? 'Analysis Error' : "Erreur d'analyse"}
-                        </p>
-                        <p className="text-xs font-bold text-slate-800 leading-relaxed px-2">
-                          {error}
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
+                          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-red-500 to-amber-500" />
+                          
+                          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-3xl flex items-center justify-center mx-auto shadow-xs border border-red-100">
+                            {isNotPlantError ? (
+                              <CameraOff size={32} className="stroke-[2]" />
+                            ) : (
+                              <AlertTriangle size={32} className="stroke-[2]" />
+                            )}
+                          </div>
 
-                  {!diagnosis && !isProcessing ? (
-                    <div className="space-y-6 text-center">
-                      <div className="max-w-md mx-auto">
-                        <div className="bg-brand-light w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <Camera className="text-brand" size={32} />
+                          <div className="space-y-3">
+                            <h3 className="text-lg md:text-xl font-extrabold text-slate-900 tracking-tight leading-snug">
+                              {errorTitle}
+                            </h3>
+                            <div className="bg-red-50/50 rounded-2xl p-4 border border-red-50 text-xs font-bold text-red-700 leading-relaxed max-w-md mx-auto">
+                              {error}
+                            </div>
+                          </div>
+
+                          <div className="border-t border-slate-100 pt-5 text-left">
+                            <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                              <Sprout size={14} className="text-brand shrink-0" />
+                              {errTrans.recommendationsTitle}
+                            </h4>
+                            
+                            <div className="space-y-4">
+                              {tipsToUse.map((tip, idx) => (
+                                <div key={idx} className="flex gap-3">
+                                  <div className="w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100 shrink-0 mt-0.5 text-[10px] font-bold text-slate-600">
+                                    {idx + 1}
+                                  </div>
+                                  <div className="space-y-0.5">
+                                    <p className="text-xs font-bold text-slate-800">{tip.title}</p>
+                                    <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">{tip.desc}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => setError(null)}
+                            className="w-full py-4 px-6 bg-brand hover:bg-brand-dark text-white rounded-2xl font-extrabold text-xs tracking-wide transition-all shadow-lg shadow-brand/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                          >
+                            <Camera size={16} />
+                            {errTrans.newScanBtn}
+                          </button>
+                        </motion.div>
+                      ) : isProcessing ? (
+                        <div className="py-8 flex flex-col items-center">
+                          <div className="mb-8 text-center">
+                            <h2 className="text-xl font-bold text-slate-900 mb-1">{t.analyzing}</h2>
+                            <p className="text-xs text-slate-400 font-medium">{t.applyingContext}</p>
+                          </div>
+
+                          {capturedImage && (
+                            <div className="relative w-full max-w-sm aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                              <img 
+                                src={capturedImage} 
+                                alt="Captured" 
+                                className="w-full h-full object-cover grayscale-[0.5] opacity-80"
+                              />
+                              <motion.div 
+                                className="absolute inset-x-0 h-1 bg-brand shadow-[0_0_15px_rgba(62,142,94,0.8)] z-10"
+                                initial={{ top: 0 }}
+                                animate={{ top: '100%' }}
+                                transition={{ 
+                                  repeat: Infinity, 
+                                  duration: 2, 
+                                  ease: "linear" 
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-b from-brand/10 to-transparent pointer-events-none" />
+                            </div>
+                          )}
                         </div>
-                        <h2 className="text-xl font-bold text-slate-900 mb-2">{t.newAnalysis}</h2>
-                        <p className="text-xs text-slate-500 mb-8">{t.newAnalysisDesc}</p>
-                        <CameraCapture onCapture={handleCapture} isProcessing={isProcessing} language={language} />
-                      </div>
-                    </div>
-                  ) : isProcessing ? (
-                    <div className="py-8 flex flex-col items-center">
-                      <div className="mb-8 text-center">
-                        <h2 className="text-xl font-bold text-slate-900 mb-1">{t.analyzing}</h2>
-                        <p className="text-xs text-slate-400 font-medium">{t.applyingContext}</p>
-                      </div>
-
-                      {capturedImage && (
-                        <div className="relative w-full max-w-sm aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
-                          <img 
-                            src={capturedImage} 
-                            alt="Captured" 
-                            className="w-full h-full object-cover grayscale-[0.5] opacity-80"
-                          />
-                          {/* Scanning Line Animation */}
-                          <motion.div 
-                            className="absolute inset-x-0 h-1 bg-brand shadow-[0_0_15px_rgba(62,142,94,0.8)] z-10"
-                            initial={{ top: 0 }}
-                            animate={{ top: '100%' }}
-                            transition={{ 
-                              repeat: Infinity, 
-                              duration: 2, 
-                              ease: "linear" 
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-b from-brand/10 to-transparent pointer-events-none" />
+                      ) : diagnosis ? (
+                        <div className="space-y-6">
+                          <button 
+                            onClick={() => setDiagnosis(null)}
+                            className="text-xs font-bold text-brand flex items-center gap-2 hover:underline"
+                          >
+                            <ChevronLeft size={14} /> {t.redo}
+                          </button>
+                          <DiagnosisResult result={diagnosis} language={language} />
+                        </div>
+                      ) : (
+                        <div className="space-y-6 text-center">
+                          <div className="max-w-md mx-auto">
+                            <div className="bg-brand-light w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                              <Camera className="text-brand" size={32} />
+                            </div>
+                            <h2 className="text-xl font-bold text-slate-900 mb-2">{t.newAnalysis}</h2>
+                            <p className="text-xs text-slate-500 mb-8">{t.newAnalysisDesc}</p>
+                            <CameraCapture onCapture={handleCapture} isProcessing={isProcessing} language={language} />
+                          </div>
                         </div>
                       )}
-                    </div>
-                  ) : diagnosis && (
-                    <div className="space-y-6">
-                      <button 
-                        onClick={() => setDiagnosis(null)}
-                        className="text-xs font-bold text-brand flex items-center gap-2 hover:underline"
-                      >
-                        <ChevronLeft size={14} /> {t.redo}
-                      </button>
-                      <DiagnosisResult result={diagnosis} language={language} />
-                    </div>
-                  )}
-                </motion.div>
+                    </motion.div>
+                  );
+                })()
               } />
 
               <Route path="/history" element={
