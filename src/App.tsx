@@ -269,7 +269,7 @@ export default function App() {
     setIsProcessing(true);
     setError(null);
     try {
-      const result = await analyzeCropPhoto(base64, mimeType);
+      const result = await analyzeCropPhoto(base64, mimeType, language);
       setDiagnosis(result);
       saveToHistory(result, base64);
       
