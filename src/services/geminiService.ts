@@ -146,7 +146,7 @@ export async function analyzeCropPhoto(base64Image: string, mimeType: string, la
 
     return result;
   } catch (error: any) {
-    console.error("Error analyzing crop photo:", error);
+    console.log("Info: Handled analysis message:", error.message || error);
     if (error.message && (
       error.message.includes("VunaAI") || 
       error.message.includes("exclusively designed") || 

@@ -5,7 +5,7 @@ import CameraCapture from './components/CameraCapture';
 import DiagnosisResult from './components/DiagnosisResult';
 import { analyzeCropPhoto, AnalysisResult } from './services/geminiService';
 import { motion, AnimatePresence } from 'motion/react';
-import { History, ChevronLeft, Calendar, Languages, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin, Sprout, Settings as SettingsIcon, Trash2, AlertTriangle, Share2, FileDown, Globe } from 'lucide-react';
+import { History, ChevronLeft, Calendar, Languages, Info, Sun, LayoutDashboard, Camera, CloudRain, Thermometer, Droplets, MapPin, Sprout, Settings as SettingsIcon, Trash2, AlertTriangle, Share2, FileDown, Globe, X } from 'lucide-react';
 import { translations, Language, languages } from './constants/translations';
 import { fetchLocalWeather, WeatherData } from './services/weatherService';
 import { downloadPDF, sharePDF } from './services/pdfService';
@@ -454,8 +454,36 @@ export default function App() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="space-y-8 min-h-[60vh] flex flex-col items-center justify-center"
+                  className="space-y-8 min-h-[60vh] flex flex-col items-center justify-center w-full"
                 >
+                  {error && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="w-full max-w-md bg-red-50 border border-red-100 rounded-3xl p-6 text-center space-y-4 shadow-xs relative overflow-hidden"
+                    >
+                      <div className="absolute top-3 right-3">
+                        <button 
+                          onClick={() => setError(null)}
+                          className="p-1.5 text-red-400 hover:text-red-500 rounded-full hover:bg-red-100/50 transition-all cursor-pointer flex items-center justify-center"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="w-12 h-12 bg-red-100/80 text-red-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                        <AlertTriangle size={24} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <p className="text-[10px] font-black uppercase text-red-500 tracking-wider">
+                          {language === 'sw' ? 'Hitilafu ya Uchambuzi' : language === 'en' ? 'Analysis Error' : "Erreur d'analyse"}
+                        </p>
+                        <p className="text-xs font-bold text-slate-800 leading-relaxed px-2">
+                          {error}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+
                   {!diagnosis && !isProcessing ? (
                     <div className="space-y-6 text-center">
                       <div className="max-w-md mx-auto">
