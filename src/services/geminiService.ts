@@ -28,7 +28,7 @@ export interface AnalysisResult {
 }
 
 export async function analyzeCropPhoto(base64Image: string, mimeType: string, language: Language = 'fr'): Promise<AnalysisResult> {
-  const model = "gemini-3.5-flash";
+  const model = "gemini-2.5-flash";
 
   const languageInstructions = {
     fr: `
